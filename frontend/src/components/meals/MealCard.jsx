@@ -28,9 +28,14 @@ export default function MealCard({
         </div>
       </div>
       {meal.ingredients?.length > 0 && (
-        <p className="text-sm text-gray-600 truncate">
-          {meal.ingredients.map((i) => `${i.food_name} ${Number(i.portion_g)}g`).join(" · ")}
-        </p>
+        <div className="flex flex-wrap gap-x-2 gap-y-1 pt-1">
+          {meal.ingredients.map((i, idx) => (
+            <span key={idx} className="text-sm text-gray-600">
+              {i.food_name}{" "}<span className="font-medium text-gray-800">{Number(i.portion_g)}g</span>
+              {idx < meal.ingredients.length - 1 && <span className="text-gray-300 ml-1.5">·</span>}
+            </span>
+          ))}
+        </div>
       )}
       <div className="grid grid-cols-3 gap-2 text-sm">
         <Stat label="Calories" value={number(meal.total_calories || meal.calories)} />

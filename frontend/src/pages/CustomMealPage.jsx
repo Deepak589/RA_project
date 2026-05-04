@@ -38,9 +38,14 @@ function CustomMealLogItem({ log, customMeal }) {
         </p>
       </div>
       {ingredients.length ? (
-        <p className="text-sm text-gray-600">
-          {ingredients.map((ingredient) => `${ingredient.food_name} ${number(ingredient.portion_g)}g`).join(" · ")}
-        </p>
+        <div className="flex flex-wrap gap-x-2 gap-y-1 pt-1">
+          {ingredients.map((ingredient, idx) => (
+            <span key={idx} className="text-sm text-gray-600">
+              {ingredient.food_name}{" "}<span className="font-medium text-gray-800">{number(ingredient.portion_g)}g</span>
+              {idx < ingredients.length - 1 && <span className="text-gray-300 ml-1.5">·</span>}
+            </span>
+          ))}
+        </div>
       ) : null}
     </Card>
   );
@@ -49,12 +54,24 @@ function CustomMealLogItem({ log, customMeal }) {
 export default function CustomMealPage() {
   const queryClient = useQueryClient();
   const messageTimeoutRef = useRef(null);
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const [lastDay, setLastDay] = useState(todayKey);
   const [basket, setBasket] = useState([]);
   const [name, setName] = useState("");
   const [mealType, setMealType] = useState(currentMealType());
   const [savedMessage, setSavedMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [recentMeals, setRecentMeals] = useState({});
+
+  useEffect(() => {
+    if (todayKey !== lastDay) {
+      setBasket([]);
+      setName("");
+      setSavedMessage(false);
+      setErrorMessage("");
+      setLastDay(todayKey);
+    }
+  }, [todayKey, lastDay]);
 
   const logs = useQuery({ queryKey: ["food-logs", "today"], queryFn: getTodayFoodLogs });
   const customMeals = useQuery({ queryKey: ["custom-meals"], queryFn: getCustomMeals });
@@ -80,7 +97,7 @@ export default function CustomMealPage() {
         grams: Number(item.grams),
       }));
 
-      const { data: meal } = await apiClient.post("/api/v1/custom-meals", {
+      const { data: meal } = await apiClient.post("/api/v1/meals/custom", {
         name: name.trim(),
         ingredients,
       });

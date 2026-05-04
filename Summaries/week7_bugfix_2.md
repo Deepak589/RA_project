@@ -9,6 +9,11 @@ Update on 2026-05-04: verified an additional Today&apos;s Logs rendering fix for
 entries. The frontend is using the unique `tracking.food_logs.id` value as the React key for
 today-log rows, which prevents duplicate logs of the same meal from collapsing into one item.
 
+Additional update on 2026-05-04: refined custom meal creation and ingredient display UX in the
+frontend. Custom meal saves now target the corrected backend route, the custom meal builder resets
+stale draft state when a new UTC day begins, and both recommendation cards and custom meal log
+rows render ingredients with wrapped tokens instead of a single truncated line.
+
 ---
 
 ## 2. Bugs Fixed
@@ -130,6 +135,37 @@ same curated meal, so React reused the same row instead of rendering both log en
 
 ---
 
+### BUG 7 — Custom meal save route and same-day draft state drift
+
+**Root cause:** The custom meal builder was posting to the older custom-meals endpoint path, and
+its local draft state could persist across day boundaries in the same browser session.
+
+**Files changed:**
+
+- `frontend/src/pages/CustomMealPage.jsx`
+  - Changed custom meal creation POST from `/api/v1/custom-meals` to `/api/v1/meals/custom`
+  - Added `todayKey` / `lastDay` tracking
+  - Added a day rollover `useEffect` that clears `basket`, `name`, success state, and error
+    state when the current UTC date changes
+
+---
+
+### BUG 8 — Ingredient text truncates in meal cards and custom meal log rows
+
+**Root cause:** Ingredient lists were rendered as one joined string inside a truncated paragraph,
+which hid later ingredients on narrower screens and reduced scanability.
+
+**Files changed:**
+
+- `frontend/src/components/meals/MealCard.jsx`
+  - Replaced the truncated ingredient paragraph with a wrapped token layout
+  - Each ingredient now shows the food name plus a styled gram amount with separators
+
+- `frontend/src/pages/CustomMealPage.jsx`
+  - Updated `CustomMealLogItem` to use the same wrapped token layout for ingredient display
+
+---
+
 ## 3. Tests
 
 - `tests/services/test_variety_penalty.py` — 7 unit tests + 1 integration test (added in bugfix pass 1, verified here)
@@ -140,8 +176,13 @@ same curated meal, so React reused the same row instead of rendering both log en
 ## 4. Build Verification
 
 - `npm run build` in `frontend/` — clean build, no errors, no type errors
-  - 2026-05-04 output: `dist/assets/index-DQwNdOoH.js 682.14 kB`
-  - Chunk size warning only; build completed successfully
+  - 2026-05-04 latest verified rerun:
+    - `dist/assets/index-C95emtMf.js 682.70 kB`
+    - `dist/assets/index-Billdmla.css 16.94 kB`
+    - build completed in `5.11s`
+  - Earlier 2026-05-04 verified output in this bugfix session:
+    - `dist/assets/index-Cx8gaaI7.js 682.48 kB` after `CustomMealPage.jsx` updates
+  - Chunk size warning only; builds completed successfully
 - `docker exec ra_project-api-1 pytest tests/ -v` — 95/95 passed, no regressions
 
 ---
@@ -149,8 +190,10 @@ same curated meal, so React reused the same row instead of rendering both log en
 ## 5. Graph Update
 
 - Attempted to run `graphify update .` on 2026-05-04
-- Blocked in this environment because the available `graphify` npm package does not expose the
-  repo&apos;s expected CLI binary
+- Still blocked in this environment because the repo hook expects
+  `node_modules/.bin/graphify`, but that executable is not present in this workspace
+- Confirmed `frontend/node_modules/.bin` also does not contain a `graphify` binary
+- The installed `graphify` package is not exposing the expected project CLI here
 - Existing checked-in graph output remains the latest available snapshot:
   - `graphify-out/GRAPH_REPORT.md` timestamp: 2026-05-03
   - Snapshot metrics: **719 nodes, 1399 edges, 69 communities**
@@ -173,5 +216,6 @@ User saves LifestyleLog (sleep_hours, stress_level, medication_taken)
 
 ✓ WEEK 7 BUG FIX PASS 2 COMPLETE — meal ingredient display, saved-meal UX state,
 analytics acceptance rate denominator, lifestyle-to-recommendation signal chain,
-and duplicate Today&apos;s Logs rendering are verified; frontend build is clean and the
-remaining graph-refresh issue is environmental rather than application code
+duplicate Today&apos;s Logs rendering, custom meal route correction, day-rollover draft reset,
+and wrapped ingredient presentation are verified; frontend builds are clean and the remaining
+graph-refresh issue is environmental rather than application code

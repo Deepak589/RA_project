@@ -9,8 +9,10 @@ if git diff --quiet 2>/dev/null && git diff --cached --quiet 2>/dev/null; then
 fi
 
 # Refresh graph in background, non-blocking
-if command -v graphify >/dev/null 2>&1; then
-  (graphify update . >/dev/null 2>&1 &) || true
+# with:
+GRAPHIFY="$(pwd)/node_modules/.bin/graphify"
+if [ -x "$GRAPHIFY" ]; then
+  ("$GRAPHIFY" update . >/dev/null 2>&1 &) || true
 fi
 
 # Nudge — your terminal only, not Claude's context
