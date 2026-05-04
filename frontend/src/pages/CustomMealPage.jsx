@@ -94,11 +94,12 @@ export default function CustomMealPage() {
     mutationFn: async () => {
       const ingredients = basket.map((item) => ({
         food_id: item.foodId,
-        grams: Number(item.grams),
+        portion_g: Number(item.grams),
       }));
 
       const { data: meal } = await apiClient.post("/api/v1/meals/custom", {
         name: name.trim(),
+        meal_type: mealType,
         ingredients,
       });
 
