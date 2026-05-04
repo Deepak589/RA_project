@@ -1,0 +1,269 @@
+You are fixing 5 bugs in a React + FastAPI RA lifestyle app. Read all files before changing anything. Make surgical changes only — do not refactor unrelated code.
+
+---
+
+## CONTEXT
+
+Stack: React (Vite, React Query, Axios), FastAPI, PostgreSQL.
+Auth: httpOnly cookie (ra_refresh), in-memory access token.
+Key files:
+- frontend/src/pages/MealLogPage.jsx
+- frontend/src/pages/AnalyticsPage.jsx
+- frontend/src/components/FoodLogItem.jsx (or wherever food log items render)
+- frontend/src/pages/DashboardPage.jsx
+- frontend/src/pages/LifestyleLogPage.jsx
+- app/services/dashboard_service.py
+- app/services/rule_engine.py
+- app/routers/logs.py
+
+---
+
+## BUG 1 + BUG 3 — Meal display shows name only, no ingredients or grams
+
+### Symptom
+- Dashboard meal cards show no gram amounts or ingredient list.
+- Food log section shows "My protein lunch" or "Food log" as the label — not ingredient names and gram amounts.
+
+### Root cause
+FoodLogItem renders log.custom_food_name or meal_type as the label. When a log has a meal_id, the component never fetches the meal detail to expand ingredients. The API endpoint GET /api/v1/meals/{meal_id} returns a full ingredients array — it is just never called.
+
+### Fix required
+1. In the component that renders each food log entry (FoodLogItem or equivalent):
+   - If the log has a meal_id, fetch GET /api/v1/meals/{meal_id} on mount.
+   - Render the meal name as the primary label.
+   - Below the name, render each ingredient as: "{ingredient_name}  {grams}g"
+   - Example: "Salmon 150g · Quinoa 80g · Spinach 60g"
+2. In DashboardPage, apply the same ingredient expansion to any meal card shown in today's meal summary.
+3. If the log has custom_food_name and no meal_id, display the custom name as-is — no fetch needed.
+4. Do not show "Food log" or raw meal_type as the visible label anywhere.
+
+### Verify
+After fix: logging a curated meal shows its name + each ingredient with grams in both the meal log page and the dashboard.
+
+---
+
+## BUG 2 — Saved meal list stays visible after logging
+
+### Symptom
+After user selects and logs a meal from the saved/recent meals list, the list remains on screen. User sees a stack of previously saved meals even after successfully logging one, which is confusing.
+
+### Root cause
+After POST /food-logs succeeds, React Query invalidates ["food-logs","today"] but the local UI state controlling the saved meals list (selected food state, recent meals display) is not reset. The list is driven by local state, not the cache.
+
+### Fix required
+In MealLogPage.jsx, after a successful meal log submission:
+1. Clear selected food state (setSelectedFood(null) or equivalent).
+2. Collapse or hide the recent/saved meals list — set its visibility state to false.
+3. Show a brief inline success confirmation ("Meal logged") where the list was, then let the user initiate a new log if they want.
+4. Do NOT clear the list on page mount — only on successful submission.
+
+### Verify
+After fix: log a meal → saved meals list disappears → success message shown → user can tap to add another meal.
+
+---
+
+## BUG 4 — Acceptance rate shows two different numbers (4% vs 29%)
+
+### Symptom
+The "Accepted" metric card in the Insights/Analytics screen shows ~4%.
+The weekly adherence bar or insights text shows ~29%.
+Both claim to represent recommendation acceptance but use different calculations.
+
+### Root cause
+Two different formulas are in use:
+- Card: accepted_count / total_recommendations_shown (includes recommendations never interacted with)
+- Bar: accepted_count / (accepted_count + skipped_count) (only counts interactions)
+
+These measure different things and are both unlabelled, causing confusion.
+
+### Fix required
+Backend — app/services/dashboard_service.py:
+1. Define ONE acceptance rate: accepted_count / (accepted_count + skipped_count). Only include recommendation_logs where feedback_status is not null.
+2. Return this as recommendation_acceptance_rate in GET /api/v1/dashboard/weekly.
+3. Remove or stop returning any secondary acceptance calculation.
+
+Frontend — AnalyticsPage.jsx:
+1. Read only recommendation_acceptance_rate from the weekly response.
+2. Remove the duplicate metric source.
+3. Both the card and the bar must read from this single field.
+4. Label the card clearly: "Accepted (of decisions made)" so the denominator is transparent.
+
+### Verify
+After fix: both the card and the bar show the same number. The label clarifies what is being measured.
+
+---
+
+You are fixing BUG 5 — lifestyle log signals are not wired into the recommendation rule engine.
+Read every file fully before making any change. Surgical edits only.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CONFIRMED ROOT CAUSE (from reading app/services/rule_engine.py)
+
+get_next_meal_recommendation() fetches:
+  - user preferences         ✓
+  - medications              ✓
+  - today's nutrition        ✓
+  - symptom log (via get_recommendation_mode) ✓
+  - lifestyle log            ✗  MISSING — never queried
+
+tracking.lifestyle_logs has columns:
+  sleep_hours, steps, water_ml, stress_level, medication_taken, log_date
+
+These values are stored but never read by the rule engine.
+The recommendation_mode (normal / mixed / flare_only) is set from symptoms only.
+Lifestyle signals (poor sleep, high stress) should ALSO influence it.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FILES TO EDIT
+
+1. app/services/rule_engine.py          — add lifestyle query + signals
+2. app/models/log.py                    — confirm LifestyleLog model exists (read only, no edit needed unless import missing)
+3. frontend/src/pages/LifestyleLogPage.jsx  — add query invalidation after save
+4. app/services/dashboard_service.py   — confirm lifestyle_summary is returned in today dashboard (read, fix if missing)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGE 1 — app/services/rule_engine.py
+
+Step A: Add import for LifestyleLog at top with other model imports:
+  from app.models.log import LifestyleLog, SymptomLog
+
+Step B: Add this helper function (place it after get_recommendation_mode):
+
+  async def get_todays_lifestyle(db: AsyncSession, user_id: UUID):
+      today = datetime.now(timezone.utc).date()
+      return await db.scalar(
+          select(LifestyleLog)
+          .where(LifestyleLog.user_id == user_id, LifestyleLog.log_date == today)
+      )
+
+Step C: In get_next_meal_recommendation(), after the line:
+  recommendation_mode = "flare_only" if flare_active else await get_recommendation_mode(db, user_id)
+
+Add this block IMMEDIATELY after:
+
+  # Lifestyle override — poor sleep or high stress escalates mode toward flare_only
+  lifestyle = await get_todays_lifestyle(db, user_id)
+  if lifestyle is not None and recommendation_mode == "normal":
+      sleep_low = lifestyle.sleep_hours is not None and lifestyle.sleep_hours < 6
+      stress_high = lifestyle.stress_level is not None and lifestyle.stress_level >= 7
+      if sleep_low and stress_high:
+          recommendation_mode = "flare_only"
+          logs.append("[LIFESTYLE: poor sleep + high stress → flare_only mode]")
+      elif sleep_low or stress_high:
+          recommendation_mode = "mixed"
+          logs.append("[LIFESTYLE: poor sleep or high stress → mixed mode]")
+  elif lifestyle is not None and recommendation_mode == "mixed":
+      sleep_low = lifestyle.sleep_hours is not None and lifestyle.sleep_hours < 5
+      stress_high = lifestyle.stress_level is not None and lifestyle.stress_level >= 8
+      if sleep_low or stress_high:
+          recommendation_mode = "flare_only"
+          logs.append("[LIFESTYLE: severe sleep/stress on top of symptom mixed → flare_only mode]")
+
+  # medication_taken=False — log only, do not change scoring (clinical boundary)
+  if lifestyle is not None and lifestyle.medication_taken is False:
+      logs.append("[LIFESTYLE: medication not taken today — no score change, clinician boundary]")
+
+Step D: Update explanation_prefix for mixed mode to include lifestyle context when relevant.
+  Find this line:
+    explanation_prefix = (
+        "You reported some discomfort today. We have prioritised gentle meals..."
+    )
+  Replace with:
+    lifestyle_note = ""
+    if lifestyle is not None:
+        if lifestyle.sleep_hours is not None and lifestyle.sleep_hours < 6:
+            lifestyle_note = " Your sleep was short today."
+        elif lifestyle.stress_level is not None and lifestyle.stress_level >= 7:
+            lifestyle_note = " Your stress level was high today."
+    explanation_prefix = (
+        f"You reported some discomfort today.{lifestyle_note} "
+        "We have prioritised gentle meals while keeping your nutrition balanced. "
+    )
+
+Step E: Pass lifestyle into the recommendation_context_jsonb for audit trail.
+  Find:
+    recommendation_context_jsonb={"meal_type": meal_type, "medications": medications, "logs": logs},
+  Replace with:
+    recommendation_context_jsonb={
+        "meal_type": meal_type,
+        "medications": medications,
+        "logs": logs,
+        "lifestyle": {
+            "sleep_hours": float(lifestyle.sleep_hours) if lifestyle and lifestyle.sleep_hours is not None else None,
+            "stress_level": int(lifestyle.stress_level) if lifestyle and lifestyle.stress_level is not None else None,
+            "medication_taken": lifestyle.medication_taken if lifestyle else None,
+        } if lifestyle else None,
+    },
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGE 2 — frontend/src/pages/LifestyleLogPage.jsx
+
+After successful POST /api/v1/logs/lifestyle, invalidate these query keys:
+  queryClient.invalidateQueries({ queryKey: ["dashboard", "today"] })
+  queryClient.invalidateQueries({ queryKey: ["dashboard", "weekly"] })
+  queryClient.invalidateQueries({ queryKey: ["recommendations", "next"] })
+
+The last one forces a fresh recommendation on next visit, reflecting new lifestyle signals.
+Do NOT add a hard navigate — let the user stay on the page and see the success state.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGE 3 — app/services/dashboard_service.py (READ FIRST, fix only if broken)
+
+Find where GET /api/v1/dashboard/today builds its response.
+Confirm it queries tracking.lifestyle_logs for today and includes:
+  sleep_hours, steps, water_ml, stress_level, medication_taken
+
+If lifestyle_summary key is missing or always null/empty when a log exists:
+  Add a query: SELECT * FROM tracking.lifestyle_logs WHERE user_id=? AND log_date=today
+  Include the result in the response under "lifestyle_summary".
+
+Do NOT change the response shape if it already returns lifestyle_summary correctly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DO NOT TOUCH
+
+- Medication scoring logic in medication_filter.py
+- Symptom log queries in get_recommendation_mode()
+- Any migration files — LifestyleLog model and log_date column already exist
+- Nutrition tracker logic
+- Any frontend file other than LifestyleLogPage.jsx
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+VERIFY AFTER CHANGES
+
+Test 1 — Poor sleep triggers mixed mode:
+  POST /api/v1/logs/lifestyle with sleep_hours=5, stress_level=4, no symptom log today
+  GET /api/v1/recommendations/next → recommendation_mode must be "mixed"
+  explanation must mention discomfort or sleep
+
+Test 2 — Poor sleep + high stress triggers flare_only:
+  POST /api/v1/logs/lifestyle with sleep_hours=4, stress_level=8, no symptom log today
+  GET /api/v1/recommendations/next → recommendation_mode must be "flare_only"
+  primary recommendation must have is_flare_friendly=true
+
+Test 3 — Good sleep, low stress — no mode change:
+  POST /api/v1/logs/lifestyle with sleep_hours=8, stress_level=3
+  GET /api/v1/recommendations/next → recommendation_mode must be "normal"
+
+Test 4 — Dashboard reflects lifestyle:
+  After POST lifestyle log → GET /api/v1/dashboard/today → lifestyle_summary not null
+
+Test 5 — Frontend invalidation:
+  Save lifestyle log → navigate to dashboard → shows updated lifestyle values without reload
+
+
+## GLOBAL RULES FOR THIS TASK
+
+- Read each file fully before editing it.
+- Change only lines directly related to each bug above.
+- Do not rename variables, reorganise imports, or refactor unrelated functions.
+- Do not add new DB migrations — all required columns already exist.
+- After all changes: run npm run build in frontend/ and confirm it passes. Run pytest tests/ in the backend Docker environment and confirm no regressions.
+- If a file you need does not exist at the path expected, search the graph under graph folder for the correct path before proceeding.

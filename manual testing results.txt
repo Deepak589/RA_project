@@ -1,0 +1,19 @@
+1. we cant retrieve the password if the user forgets the password or I don't know if that is necessary now 
+
+2. Two refresh red flags(401 unauthorized) which are post requests and one favicon.ico 404 not found which is get request
+
+3. Only one primary meal card no alternatives we can skip the meal and it showing the other meal and it only showing how much protein and calories it has but not the amount of food we need to eat to get that much calories basically it showing macros but not how much quantity of that meal like not rice 100 grams veggies 100 grams
+
+4. The meal is not repeating 4th time but it is repeating after like 5th or 6th time and after logging the meal it is still showing as food logged not meal logged and it not showing the name of the food we logged but only showing the macros of food we logged and I can't click on it to get to know more 
+
+5. After logging the meal if we refresh page it's going back to login page we should at least keep it login for 15 mins if there is no event on page for 15 mins then we should jump back to login page 
+
+6. For building own meal no suggestion until we search for particular food and its same with this not showing how many grams is that food it just showing only macros of that food item, and as same as above after selecting the food in the log meals only showing total macros with like protein lunch no other name can be given manually. Good part no same recommendation until we search for it 
+
+7 I feel like we have a very limited source of food items. Search tab working as expected. Meals log not updated properly only showing 1 meal perday even tho we have selected multiple foods and build 2 custom meals
+
+8 Flow 4 working fine as expected.
+
+9 Flow 5 working fine as expected.
+
+10 Flow 6 is working fine as expected. Dashboard also working fine 

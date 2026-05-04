@@ -1,0 +1,17 @@
+Week 3 scoring verification
+Generated: 2026-04-20
+
+Highest scoring inserted foods:
+- Fish, salmon, Atlantic, farm raised, raw: score=8.5, omega3_g=1.610
+- Beans, Dry, Brown (0% moisture): score=7.5, fiber_g=4.10
+- Beans, Dry, Dark Red Kidney (0% moisture): score=7.5, fiber_g=4.30
+- Beans, Dry, Light Red Kidney (0% moisture): score=7.5, fiber_g=4.50
+- Fish, salmon, sockeye, wild caught, raw: score=7.5, omega3_g=0.626
+- Spices, ginger, ground: score=7.5, fiber_g=14.10
+- Spices, turmeric, ground: score=7.5, fiber_g=22.70
+- Tofu, fried: score=7.5, protein_g=18.80, fiber_g=3.90
+
+Scoring notes:
+- Salmon receives the strongest score because fish category and omega-3 bonuses stack.
+- High-fiber legumes and spices score well even where USDA omits calories.
+- Scores remain clamped between 0 and 10.

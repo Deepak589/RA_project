@@ -1,0 +1,227 @@
+You are an expert software architect. Think step by step.
+Complete each task fully before moving to the next.
+Use your web search tool for Tasks 1 and 4.
+After each task print: ✓ TASK [N] COMPLETE
+
+═══════════════════════════════════════════════════════════
+PROJECT CONTEXT
+═══════════════════════════════════════════════════════════
+
+App purpose:
+- Help adults with Rheumatoid Arthritis log meals and symptoms
+- Recommend the next best meal based on nutrition rules
+- Track daily lifestyle factors (sleep, activity, stress)
+- Later (V2/V3): detect flare triggers and predict pain/flare risk
+
+Target user: Adult with RA who wants practical food and lifestyle guidance
+Medical boundary: Supportive lifestyle tool ONLY — not a diagnostic system,
+not a replacement for a rheumatologist or dietitian
+
+Tech stack:
+- Backend: FastAPI (Python)
+- Database: PostgreSQL
+- Frontend: React + Vite (built in later weeks)
+- ML: scikit-learn / XGBoost (added in V3, not now)
+
+═══════════════════════════════════════════════════════════
+WEEK 1 MISSION: PROBLEM FRAMING + FULL REQUIREMENTS DOCUMENT
+═══════════════════════════════════════════════════════════
+
+Complete every task below in sequence. Do not move to the next task until 
+the current one is fully done. Think deeply at each step.
+
+───────────────────────────────────────────────────────────
+TASK 1 — DEEP RESEARCH: RA PATIENT NEEDS & CLINICAL CONTEXT
+───────────────────────────────────────────────────────────
+
+Search and analyse the following topics. Cite sources where possible.
+Summarise findings that will directly shape app design decisions.
+
+Research questions to answer:
+1. What are the most common daily pain points and frustrations for RA patients 
+   managing diet and lifestyle? (look for patient forums, NHS, NIAMS, Arthritis 
+   Foundation guidance)
+2. Which foods and nutrients are most commonly associated with reduced 
+   inflammation in RA? Which are commonly reported as triggers?
+3. What does current clinical guidance say about diet, exercise, sleep, and 
+   flare management for RA? (search NHS, NIAMS, ACR guidelines)
+4. What existing RA or chronic illness apps exist? What do users say they love 
+   or hate about them? (search app store reviews, Reddit r/rheumatoid)
+5. What are the most important safety boundaries for a non-clinical RA 
+   lifestyle app? What should it never claim or do?
+
+After research, write a 300–400 word "User and Clinical Context" summary that 
+will anchor all design decisions in this project.
+
+───────────────────────────────────────────────────────────
+TASK 2 — DEFINE THE TARGET USER WITH A FULL USER PERSONA
+───────────────────────────────────────────────────────────
+
+Create one detailed primary user persona based on your research. Include:
+
+- Name, age, occupation, location
+- RA diagnosis history and current status
+- Daily routine and pain patterns
+- Current diet habits and challenges
+- Goals for using the app
+- Frustrations with existing tools or apps
+- Tech comfort level
+- What success looks like for this user after 30 days of using the app
+
+───────────────────────────────────────────────────────────
+TASK 3 — DEFINE WHAT THE APP IS AND IS NOT
+───────────────────────────────────────────────────────────
+
+Write two clearly separated lists:
+
+WHAT THE APP DOES:
+- List every feature the app will have in V1 (rule-based MVP)
+- List features planned for V2 (analytics) and V3 (ML)
+
+WHAT THE APP NEVER DOES (hard boundaries):
+- List every claim, feature, or behaviour that is out of scope
+- Include medical safety boundaries
+- Include what the app must always say when users ask medical questions
+
+───────────────────────────────────────────────────────────
+TASK 4 — WRITE COMPLETE USER STORIES
+───────────────────────────────────────────────────────────
+
+Write user stories for every feature in the V1 MVP using this format:
+
+  As a [user type], I want to [action], so that [benefit].
+  Acceptance criteria:
+  - [ ] Criterion 1
+  - [ ] Criterion 2
+  - [ ] Criterion 3
+
+Cover all of these user story categories — do not skip any:
+
+1. Onboarding & profile setup (allergies, preferences, medications, goals)
+2. Food and meal search
+3. Meal logging (breakfast, lunch, dinner, snacks)
+4. Next-meal recommendation (with explanation text)
+5. Symptom logging (pain, fatigue, stiffness, swelling, flare)
+6. Lifestyle logging (sleep, steps, water, stress, medication taken)
+7. Daily dashboard (today's nutrition summary, recommendation, quick logs)
+8. Weekly analytics dashboard (trends, adherence)
+9. Medical disclaimer and escalation (when to prompt the user to see a doctor)
+10. Settings and preferences management
+
+Write at least 2 user stories per category. Total: minimum 20 user stories.
+
+───────────────────────────────────────────────────────────
+TASK 5 — DEFINE ALL MVP SCREENS
+───────────────────────────────────────────────────────────
+
+List every screen the React frontend will need for V1. For each screen write:
+
+Screen name:
+Route (URL path):
+Purpose (1 sentence):
+Key UI elements:
+API endpoints it will call:
+Edge cases to handle:
+
+Screens to cover at minimum:
+- Splash / login / register
+- Onboarding flow (multi-step)
+- Home dashboard
+- Meal search and food log
+- Recommendation card
+- Symptom log
+- Lifestyle log
+- Weekly analytics dashboard
+- Profile / settings
+- Medical disclaimer modal
+
+───────────────────────────────────────────────────────────
+TASK 6 — DEFINE ALL API ENDPOINTS
+───────────────────────────────────────────────────────────
+
+List every FastAPI endpoint the backend needs for V1. For each endpoint write:
+
+Method + path:
+Purpose:
+Request body or params:
+Response shape:
+Auth required (yes/no):
+Notes / edge cases:
+
+Endpoint groups to cover:
+- Auth (register, login, token refresh, logout)
+- User profile (get, update)
+- Foods (search, get by ID)
+- Meals (list, get by ID, get recommended next meal)
+- Food logs (create, get today, get by date)
+- Symptom logs (create, get by date range)
+- Lifestyle logs (create, get by date)
+- Dashboard (today summary, weekly summary)
+- Feedback (log recommendation accepted or skipped)
+
+───────────────────────────────────────────────────────────
+TASK 7 — DEFINE SUCCESS METRICS
+───────────────────────────────────────────────────────────
+
+Define how you will know Week 1 requirements are complete and V1 is working.
+
+Write acceptance criteria at three levels:
+
+1. MVP launch criteria (minimum bar to call V1 done)
+   - List 8–10 specific, testable conditions
+
+2. Recommendation quality criteria (how to know the rule engine is good)
+   - List 5–6 specific tests you will run manually
+
+3. Safety criteria (non-negotiable before any real user touches the app)
+   - List 5 specific safety checks
+
+───────────────────────────────────────────────────────────
+TASK 8 — WRITE THE MEDICAL DISCLAIMER TEXT
+───────────────────────────────────────────────────────────
+
+Write the exact text that will appear in three places in the app:
+
+1. Onboarding disclaimer (shown once, user must accept before continuing)
+2. Persistent footer disclaimer (always visible in the app)
+3. Escalation message (shown when user logs a pain score of 8+ or 
+   marks a severe flare)
+
+Each disclaimer must be clear, non-alarming, and legally appropriate for a 
+non-clinical consumer wellness app.
+
+───────────────────────────────────────────────────────────
+TASK 9 — PRODUCE THE FINAL REQUIREMENTS DOCUMENT
+───────────────────────────────────────────────────────────
+
+Combine all outputs from Tasks 1–8 into one structured requirements document 
+with the following sections:
+
+1. Executive Summary (what this app is, who it is for, why it matters)
+2. User and Clinical Context (from Task 1)
+3. Primary User Persona (from Task 2)
+4. Scope Definition — In and Out (from Task 3)
+5. User Stories (from Task 4)
+6. Screen Inventory (from Task 5)
+7. API Endpoint Inventory (from Task 6)
+8. Success Metrics and Acceptance Criteria (from Task 7)
+9. Medical Disclaimers (from Task 8)
+10. Open Questions (anything that needs a decision before Week 2 starts)
+
+Save this document as: week1_requirements.md
+
+═══════════════════════════════════════════════════════════
+EXECUTION RULES
+═══════════════════════════════════════════════════════════
+
+- Complete every task fully before moving to the next
+- Use web search for Tasks 1 and 4 to ground decisions in real clinical 
+  guidance and real patient needs — do not guess
+- Do not invent medical claims — only reference what NHS, NIAMS, ACR, 
+  or Arthritis Foundation actually say
+- Flag any decision that needs human input with [DECISION NEEDED: ...]
+- Flag anything medically uncertain with [VERIFY WITH CLINICIAN: ...]
+- At the end of each task, print: ✓ TASK [N] COMPLETE before starting the next
+- When all tasks are done, print: ✓ WEEK 1 COMPLETE — ready for Week 2
+
+Begin now with Task 1.

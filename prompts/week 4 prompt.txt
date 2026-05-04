@@ -1,0 +1,1207 @@
+You are an expert Python developer and data engineer helping build a
+Rheumatoid Arthritis (RA) Nutrition and Lifestyle App.
+
+Weeks 1, 2, and 3 are complete. Week 4 mission is to:
+1. Fix remaining data quality issues from Week 3
+2. Add new database columns and tables via migration 0003
+3. Expand the food catalog with more fish
+4. Build a curated meal library of 100 meals
+5. Build meal API endpoints for curated meals only
+
+SCOPE BOUNDARY:
+- Custom meal TABLES → create in migration 0003 (empty, no data)
+- Custom meal ENDPOINTS → deferred to Week 6, do NOT build now
+- Curated meal TABLES → create and seed with 100 meals
+- Curated meal ENDPOINTS → build fully this week
+
+Do NOT build the custom meal builder endpoints.
+Do NOT write any scripts that insert into custom_meals.
+Write and save all code to disk. No pseudocode.
+
+═══════════════════════════════════════════════════════════
+CONTEXT FROM WEEKS 1, 2, AND 3
+═══════════════════════════════════════════════════════════
+
+Stack:
+- Backend: FastAPI (Python)
+- Database: PostgreSQL — Docker service name "db"
+- ORM: SQLAlchemy 2.0, Alembic migrations
+- Validation: Pydantic v2
+- DB connection: read from os.getenv("DATABASE_URL")
+- Session: use existing get_db_session() from app/db/session.py
+  (async generator pattern — never context manager)
+
+Current DB state:
+- 12 tables live across 4 schemas
+- static.foods: 43 rows verified
+- Alembic baseline: 0001_initial_schema
+- Last migration: 0001_initial_schema
+
+Food catalog from Week 3:
+- protein: 8 foods
+- legume: 10 foods
+- vegetable: 7 foods
+- grain: 5 foods
+- fruit: 3 foods
+- oil: 3 foods (5 with calories = 0 need fixing)
+- fish: 2 foods (needs expanding)
+- nut_seed: 1 food
+- spice: 2 foods
+- other: 2 foods
+- Total: 43 foods
+
+Known data quality issues to fix:
+- Olive oil extra virgin: calories = 0
+- Olive oil extra light: calories = 0
+- Beans dry brown: calories = 0
+- Beans dark red kidney dry: calories = 0
+- Beans light red kidney dry: calories = 0
+
+Verified food rows available for meal templates:
+- Lentils raw/cooked ✅
+- Salmon Atlantic farm raised ✅
+- Chicken breast cooked ✅
+- Spinach baby/mature ✅
+- Broccoli ✅
+- Brown rice ✅
+- Oats ✅
+- Quinoa ✅
+- Walnuts ✅
+- Greek yogurt ✅
+- Eggs ✅
+- Avocado ✅
+- Sweet potato ✅
+- Blueberries ✅
+
+Anti-inflammatory scoring rules (final V1):
+- +2.0 omega3_g >= 1.0
+- +1.0 omega3_g >= 0.3
+- +1.5 fiber_g >= 5.0
+- +1.0 fiber_g >= 2.0
+- +0.5 fiber_g >= 1.0
+- +1.0 category in (fish, legume, vegetable,
+                    fruit, nut_seed, spice)
+- +0.5 protein_g >= 20.0
+- +0.5 calcium_mg >= 200.0
+- -2.0 sugar_g >= 20.0
+- -1.0 sugar_g >= 10.0
+- -1.5 saturated_fat_g >= 10.0
+- -1.0 saturated_fat_g >= 5.0
+- -1.0 sodium_mg >= 600.0
+- -0.5 sodium_mg >= 300.0
+- Score clamped 0–10, rounded to 1 decimal
+
+═══════════════════════════════════════════════════════════
+WEEK 4 MISSION
+═══════════════════════════════════════════════════════════
+
+Complete every task fully before moving to the next.
+Write and save all files to disk. No pseudocode.
+
+───────────────────────────────────────────────────────────
+TASK 1 — MIGRATION 0003: ALL NEW TABLES AND COLUMNS
+───────────────────────────────────────────────────────────
+
+Write Alembic migration:
+alembic/versions/0003_meal_library_and_food_metadata.py
+
+This single migration handles everything in one run.
+
+PART A — Add columns to static.foods:
+
+- cooking_state VARCHAR(20) default 'unspecified'
+  values: raw, cooked, ready_to_eat, unspecified
+
+- conversion_factor NUMERIC(5,3) default 1.0
+  raw to cooked multiplier for display calculations
+
+- display_note TEXT nullable
+  shown to user explaining raw vs cooked difference
+
+- quality_flag VARCHAR(30) default 'usda_verified'
+  values: usda_verified, manually_verified,
+          incomplete, under_review
+
+- manual_override BOOLEAN default false
+  true if any nutrient was manually corrected
+
+PART B — Create curated meal tables in static schema:
+
+static.meals:
+  id UUID PK default gen_random_uuid()
+  name TEXT NOT NULL
+  meal_type VARCHAR(20) NOT NULL
+    values: breakfast, lunch, dinner, snack, flare_day
+  cuisine_type VARCHAR(50) nullable
+  prep_time_minutes INTEGER nullable
+  effort_level VARCHAR(10) default 'medium'
+    values: low, medium, high
+  serving_size_description TEXT nullable
+  total_calories NUMERIC(8,2)
+  total_protein_g NUMERIC(6,2)
+  total_carbs_g NUMERIC(6,2)
+  total_fat_g NUMERIC(6,2)
+  total_fiber_g NUMERIC(6,2)
+  total_sugar_g NUMERIC(6,2)
+  total_sodium_mg NUMERIC(8,2)
+  total_omega3_g NUMERIC(6,3)
+  anti_inflammatory_score NUMERIC(4,1)
+  is_vegetarian BOOLEAN default false
+  is_flare_friendly BOOLEAN default false
+  tags JSONB default '[]'
+  instructions TEXT nullable
+  created_at TIMESTAMPTZ default now()
+  updated_at TIMESTAMPTZ default now()
+
+static.meal_ingredients:
+  id UUID PK default gen_random_uuid()
+  meal_id UUID FK → static.meals.id CASCADE
+  food_id UUID FK → static.foods.id RESTRICT
+  portion_g NUMERIC(8,2) NOT NULL
+  cooking_state VARCHAR(20) default 'cooked'
+  display_note TEXT nullable
+  created_at TIMESTAMPTZ default now()
+
+PART C — Create custom meal tables in tracking schema:
+(tables only — NO endpoints, NO seed data this week)
+
+tracking.custom_meals:
+  id UUID PK default gen_random_uuid()
+  user_id UUID FK → core.users.id CASCADE
+  name TEXT NOT NULL
+  meal_type VARCHAR(20)
+  total_calories NUMERIC(8,2)
+  total_protein_g NUMERIC(6,2)
+  total_carbs_g NUMERIC(6,2)
+  total_fat_g NUMERIC(6,2)
+  total_fiber_g NUMERIC(6,2)
+  total_sugar_g NUMERIC(6,2)
+  total_sodium_mg NUMERIC(8,2)
+  total_omega3_g NUMERIC(6,3)
+  anti_inflammatory_score NUMERIC(4,1)
+  is_vegetarian BOOLEAN default false
+  is_flare_friendly BOOLEAN default false
+  tags JSONB default '[]'
+  created_at TIMESTAMPTZ default now()
+  updated_at TIMESTAMPTZ default now()
+
+tracking.custom_meal_ingredients:
+  id UUID PK default gen_random_uuid()
+  custom_meal_id UUID FK → tracking.custom_meals.id CASCADE
+  food_id UUID FK → static.foods.id RESTRICT
+  portion_g NUMERIC(8,2)
+  cooking_state VARCHAR(20)
+  display_note TEXT nullable
+  created_at TIMESTAMPTZ default now()
+
+Migration order inside upgrade():
+1. Add columns to static.foods first
+2. Create static.meals
+3. Create static.meal_ingredients
+4. Create tracking.custom_meals
+5. Create tracking.custom_meal_ingredients
+
+downgrade() reverses in opposite order.
+
+Run migration:
+  alembic upgrade head
+
+Verify:
+  SELECT table_schema, table_name
+  FROM information_schema.tables
+  WHERE table_schema IN ('static','tracking')
+  ORDER BY table_schema, table_name;
+  → expect static.foods, static.meals,
+    static.meal_ingredients,
+    tracking.custom_meals,
+    tracking.custom_meal_ingredients
+    plus all existing tracking tables
+
+  SELECT column_name FROM information_schema.columns
+  WHERE table_schema = 'static'
+  AND table_name = 'foods'
+  ORDER BY ordinal_position;
+  → confirm cooking_state, conversion_factor,
+    display_note, quality_flag, manual_override
+    all present
+
+Print: ✓ TASK 1 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 2 — MANUAL OVERRIDE FOR CALORIES = 0 FOODS
+───────────────────────────────────────────────────────────
+
+Write script: scripts/manual_override_foods.py
+
+Apply these verified nutritional values
+(source: USDA standard reference + WHO nutritional data):
+
+Olive oil extra virgin (per 100g):
+  calories: 884
+  fat_g: 100.0
+  saturated_fat_g: 13.8
+  omega3_g: 0.761
+  sodium_mg: 2.0
+  cooking_state: ready_to_eat
+  conversion_factor: 1.0
+  quality_flag: manually_verified
+  manual_override: true
+  display_note: null
+
+Olive oil extra light (per 100g):
+  calories: 884
+  fat_g: 100.0
+  saturated_fat_g: 13.4
+  omega3_g: 0.700
+  sodium_mg: 2.0
+  cooking_state: ready_to_eat
+  conversion_factor: 1.0
+  quality_flag: manually_verified
+  manual_override: true
+  display_note: null
+
+Beans dry brown (per 100g dry):
+  calories: 341
+  protein_g: 21.4
+  carbs_g: 60.1
+  fiber_g: 15.2
+  fat_g: 1.27
+  sugar_g: 2.1
+  sodium_mg: 5.0
+  cooking_state: raw
+  conversion_factor: 2.8
+  quality_flag: manually_verified
+  manual_override: true
+  display_note: "Values are per 100g DRY. When cooked,
+    100g dry expands to ~280g cooked.
+    Log the cooked weight you actually ate."
+
+Beans dark red kidney dry (per 100g dry):
+  calories: 333
+  protein_g: 23.6
+  carbs_g: 53.3
+  fiber_g: 24.9
+  fat_g: 1.06
+  sugar_g: 3.3
+  sodium_mg: 5.0
+  cooking_state: raw
+  conversion_factor: 2.8
+  quality_flag: manually_verified
+  manual_override: true
+  display_note: "Values are per 100g DRY. When cooked,
+    100g dry expands to ~280g cooked.
+    Log the cooked weight you actually ate."
+
+Beans light red kidney dry (per 100g dry):
+  calories: 325
+  protein_g: 22.8
+  carbs_g: 55.2
+  fiber_g: 20.0
+  fat_g: 1.10
+  sugar_g: 2.9
+  sodium_mg: 5.0
+  cooking_state: raw
+  conversion_factor: 2.8
+  quality_flag: manually_verified
+  manual_override: true
+  display_note: "Values are per 100g DRY. When cooked,
+    100g dry expands to ~280g cooked.
+    Log the cooked weight you actually ate."
+
+Script requirements:
+- Match foods by name ILIKE pattern, not UUID
+- Print before and after values for every updated field
+- After each update re-score using
+  anti_inflammatory_scorer.py
+- Save run log to: logs/manual_override_{timestamp}.json
+
+After running verify:
+  SELECT name, calories, quality_flag, manual_override
+  FROM static.foods
+  WHERE calories = 0 OR manual_override = true
+  ORDER BY name;
+  → expect 0 rows with calories = 0
+  → expect 5 rows with manual_override = true
+
+Print: ✓ TASK 2 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 3 — UPDATE COOKING STATE FOR EXISTING FOODS
+───────────────────────────────────────────────────────────
+
+Write script: scripts/update_cooking_states.py
+
+Apply cooking_state, conversion_factor, and
+display_note to all 43 existing foods based on
+name patterns:
+
+Cooking state rules:
+- name ILIKE '%raw%'       → raw
+- name ILIKE '%cooked%'    → cooked
+- name ILIKE '%braised%'   → cooked
+- name ILIKE '%boiled%'    → cooked
+- name ILIKE '%dry%'       → raw
+- name ILIKE '%canned%'    → ready_to_eat
+- name ILIKE '%oil%'       → ready_to_eat
+- name ILIKE '%yogurt%'    → ready_to_eat
+- name ILIKE '%blueberr%'  → ready_to_eat
+- name ILIKE '%avocado%'   → ready_to_eat
+- name ILIKE '%spice%'     → ready_to_eat
+- name ILIKE '%walnut%'    → ready_to_eat
+- anything unmatched       → unspecified
+
+Conversion factors by category and state:
+  raw protein (chicken, beef): 1.35
+  raw fish (salmon, tuna):     1.25
+  raw vegetables:              0.85
+  raw grains:                  2.50
+  raw legumes:                 2.80
+  cooked or ready_to_eat:      1.00
+
+Display note generation:
+  raw protein/fish:
+  "Values are per 100g RAW. When cooked, protein
+   increases to ~{protein_g * factor:.1f}g per 100g
+   as water is lost. Log your cooked portion."
+
+  raw grains/legumes:
+  "Values are per 100g DRY. When cooked, 100g dry
+   expands to ~{100 * factor:.0f}g cooked.
+   Log the cooked weight you actually ate."
+
+  raw vegetables:
+  "Values are per 100g RAW. Cooking slightly
+   concentrates nutrients. Log cooked weight
+   for best accuracy."
+
+  cooked/ready_to_eat:
+  display_note = null
+
+After running verify:
+  SELECT cooking_state, COUNT(*)
+  FROM static.foods
+  GROUP BY cooking_state
+  ORDER BY cooking_state;
+  → expect 0 rows still 'unspecified' for named foods
+
+Print: ✓ TASK 3 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 4 — EXPAND FISH CATALOG
+───────────────────────────────────────────────────────────
+
+Write script: scripts/ingest_additional_fish.py
+Follow same pattern as Week 3 ingestion script.
+
+Search terms:
+  "tuna cooked"
+  "tuna canned in water"
+  "sardines canned in oil"
+  "mackerel cooked"
+  "cod cooked"
+  "trout cooked"
+  "herring cooked"
+
+For each:
+- Foundation dataType first, SR Legacy fallback
+- cooking_state: cooked or ready_to_eat
+- conversion_factor: 1.0
+- Compute anti_inflammatory_score after insert
+- Skip if external_id + cooking_state already exists
+
+After ingestion verify:
+  SELECT name, omega3_g, anti_inflammatory_score
+  FROM static.foods
+  WHERE category = 'fish'
+  ORDER BY anti_inflammatory_score DESC;
+
+  Expected:
+  sardines/mackerel/herring >= 8.5 (very high omega3)
+  salmon >= 8.5
+  tuna/cod >= 6.5
+
+  SELECT COUNT(*) FROM static.foods
+  WHERE category = 'fish';
+  → expect >= 9 fish foods total
+
+Print: ✓ TASK 4 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 5 — UPDATE SQLALCHEMY MODELS AND PYDANTIC SCHEMAS
+───────────────────────────────────────────────────────────
+
+Update app/models/food.py:
+- Add to Food model:
+  cooking_state, conversion_factor, display_note,
+  quality_flag, manual_override
+
+Update app/models/meal.py (create if not exists):
+- Meal model matching static.meals
+- MealIngredient model matching static.meal_ingredients
+- CustomMeal model matching tracking.custom_meals
+- CustomMealIngredient matching
+  tracking.custom_meal_ingredients
+
+Relationships:
+  Meal.ingredients → list[MealIngredient]
+  MealIngredient.meal → Meal
+  MealIngredient.food → Food
+  CustomMeal.ingredients → list[CustomMealIngredient]
+  CustomMealIngredient.food → Food
+  User.custom_meals → list[CustomMeal]
+
+Update app/schemas/food.py FoodResponse:
+  Add:
+  cooking_state: str
+  conversion_factor: float
+  display_note: str | None
+  quality_flag: str
+  manual_override: bool
+  display_calories: float
+  display_protein_g: float
+
+  Compute display fields via model_validator:
+  display_calories = round(calories * conversion_factor, 1)
+  display_protein_g = round(protein_g * conversion_factor, 1)
+
+Create app/schemas/meal.py:
+  MealIngredientResponse:
+    food_id, food_name, portion_g,
+    cooking_state, display_note
+
+  MealBase: name, meal_type, cuisine_type,
+            prep_time_minutes, effort_level
+
+  MealCreate: extends MealBase
+
+  MealResponse: extends MealBase plus
+    id, all nutrient totals,
+    anti_inflammatory_score,
+    is_vegetarian, is_flare_friendly,
+    tags, instructions,
+    ingredients: list[MealIngredientResponse]
+    created_at
+
+  CustomMealBase: name, meal_type
+  CustomMealResponse: extends CustomMealBase plus
+    id, user_id, all nutrient totals,
+    anti_inflammatory_score,
+    is_vegetarian, is_flare_friendly,
+    tags, created_at
+    (no endpoints this week — schema only)
+
+Print: ✓ TASK 5 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 6 — BUILD THE CURATED MEAL LIBRARY
+───────────────────────────────────────────────────────────
+
+Write script: scripts/seed_meals.py
+
+Create exactly 100 curated meals:
+  breakfast:  20 meals
+  lunch:      25 meals
+  dinner:     25 meals
+  snack:      15 meals
+  flare_day:  15 meals
+
+INGREDIENT LOOKUP RULE:
+- Fetch ALL foods from static.foods at script start
+- Build lookup dict: {search_pattern: food_row}
+- Match ingredients by fuzzy name search:
+  "salmon" → matches "Fish, salmon, Atlantic..."
+  "chicken" → matches "Chicken, breast...cooked..."
+  "lentils" → matches "Lentils, mature seeds, cooked..."
+  "oats" → matches "Oats..." 
+  "spinach" → matches "Spinach, baby" (prefer cooked
+               if available, else raw)
+- If ingredient not found in DB:
+  log [MISSING INGREDIENT: {name}] and skip that meal
+  do NOT crash
+
+PORTION SIZE RULES (grams):
+  protein/fish source: 100–200g
+  vegetables:          50–150g
+  grains/legumes:      60–150g cooked weight
+  oils/dressings:      5–15g
+  fruits:              80–150g
+  nuts/seeds:          15–30g
+  spices:              1–5g
+  dairy (yogurt):      100–200g
+
+NUTRIENT CALCULATION:
+  total_X = sum(food.X * portion_g / 100)
+  for all ingredients in meal
+
+ANTI-INFLAMMATORY SCORE:
+  weighted average of ingredient scores
+  weight = portion_g / sum(all portion_g)
+  clamp 0–10, round to 1 decimal
+
+TAG RULES (auto-assign):
+  high_protein      → total_protein_g >= 25
+  high_fiber        → total_fiber_g >= 8
+  low_sugar         → total_sugar_g <= 5
+  low_sodium        → total_sodium_mg <= 300
+  anti_inflammatory → anti_inflammatory_score >= 7.0
+  vegetarian        → no meat or fish ingredients
+  omega3_rich       → total_omega3_g >= 0.5
+  quick_prep        → prep_time_minutes <= 15
+  flare_friendly    → is_flare_friendly = true
+  budget_friendly   → primary protein is legume or egg
+
+FLARE DAY RULES:
+  is_flare_friendly = true when ALL of:
+  - prep_time_minutes <= 20
+  - effort_level = low
+  - total_sodium_mg <= 400
+  - anti_inflammatory_score >= 6.0
+  - ingredients are soft/easy to eat
+
+IS_VEGETARIAN RULE:
+  true if no ingredient food has
+  category in (protein, fish) where
+  the food name contains meat or fish keywords
+  (chicken, beef, salmon, tuna, sardine,
+   mackerel, cod, trout, herring)
+
+TRANSACTION RULE:
+  Insert meal + all meal_ingredients in one transaction
+  If any ingredient insert fails → rollback entire meal
+  Log skipped meals with reason
+
+SAVE REPORT:
+  logs/seed_meals_{timestamp}.json
+  include: meals created, meals skipped, missing foods
+
+MEAL LIST TO SEED:
+Use these 100 meals exactly. Calculate all nutrients
+and scores automatically from ingredient data.
+
+--- BREAKFAST (20) ---
+1.  Oat porridge with blueberries and walnuts
+    oats 80g, blueberries 100g, walnuts 20g
+
+2.  Scrambled eggs with spinach
+    eggs 120g, spinach 80g, olive oil 5g
+
+3.  Greek yogurt with blueberries and ginger
+    greek yogurt 200g, blueberries 80g, ginger 2g
+
+4.  Avocado on whole grain toast with eggs
+    avocado 80g, eggs 100g, olive oil 5g
+
+5.  Oat porridge with banana and ginger
+    oats 80g, banana 100g, ginger 2g
+
+6.  Blueberry smoothie bowl with oats
+    blueberries 150g, oats 50g, greek yogurt 100g
+
+7.  Scrambled eggs with avocado
+    eggs 120g, avocado 80g, olive oil 5g
+
+8.  Greek yogurt with walnuts and blueberries
+    greek yogurt 150g, walnuts 20g, blueberries 80g
+
+9.  Oats with spinach and eggs (savoury oats)
+    oats 80g, spinach 60g, eggs 100g
+
+10. Avocado and walnut bowl
+    avocado 100g, walnuts 25g, olive oil 5g
+
+11. Blueberry oat pancakes
+    oats 80g, blueberries 100g, eggs 60g
+
+12. Greek yogurt with ginger and oats
+    greek yogurt 180g, ginger 3g, oats 40g
+
+13. Spinach and egg omelette
+    eggs 150g, spinach 100g, olive oil 5g
+
+14. Warm oats with walnuts and blueberries
+    oats 80g, walnuts 20g, blueberries 100g
+
+15. Avocado and egg breakfast bowl
+    avocado 100g, eggs 120g, spinach 50g
+
+16. Oats with avocado and olive oil
+    oats 80g, avocado 60g, olive oil 5g
+
+17. Greek yogurt with blueberries
+    greek yogurt 200g, blueberries 100g
+
+18. Walnut and blueberry oat bowl
+    walnuts 25g, blueberries 100g, oats 70g
+
+19. Spinach omelette with avocado
+    eggs 150g, spinach 100g, avocado 60g, olive oil 5g
+
+20. Ginger oat porridge with blueberries
+    oats 80g, ginger 3g, blueberries 100g
+
+--- LUNCH (25) ---
+21. Lentil soup with spinach
+    lentils 150g, spinach 100g, olive oil 10g,
+    garlic 3g, ginger 2g
+
+22. Grilled salmon with brown rice and broccoli
+    salmon 150g, brown rice 120g, broccoli 100g,
+    olive oil 8g
+
+23. Chicken breast with quinoa and spinach
+    chicken 150g, quinoa 100g, spinach 80g,
+    olive oil 8g
+
+24. Bean and vegetable stew
+    kidney beans 120g, broccoli 100g, spinach 80g,
+    olive oil 10g, garlic 3g
+
+25. Spinach salad with eggs and avocado
+    spinach 120g, eggs 100g, avocado 80g,
+    olive oil 8g
+
+26. Lentil and vegetable soup
+    lentils 150g, broccoli 80g, spinach 80g,
+    garlic 3g, olive oil 8g
+
+27. Grilled chicken with sweet potato and broccoli
+    chicken 150g, sweet potato 120g, broccoli 100g,
+    olive oil 8g
+
+28. Quinoa salad with avocado and spinach
+    quinoa 100g, avocado 80g, spinach 100g,
+    olive oil 8g, lemon 10g
+
+29. Salmon and lentil bowl
+    salmon 130g, lentils 100g, spinach 80g,
+    olive oil 8g
+
+30. Brown rice with kidney beans and spinach
+    brown rice 120g, kidney beans 100g, spinach 80g,
+    olive oil 8g, garlic 3g
+
+31. Chicken and broccoli stir fry with brown rice
+    chicken 150g, broccoli 120g, brown rice 100g,
+    olive oil 8g, garlic 3g
+
+32. Egg and avocado salad with spinach
+    eggs 120g, avocado 100g, spinach 120g,
+    olive oil 8g
+
+33. Lentil and sweet potato soup
+    lentils 150g, sweet potato 100g, garlic 3g,
+    ginger 3g, olive oil 8g
+
+34. Grilled salmon with quinoa
+    salmon 150g, quinoa 120g, spinach 80g,
+    olive oil 8g
+
+35. Chicken and kidney bean bowl
+    chicken 150g, kidney beans 100g, broccoli 80g,
+    olive oil 8g
+
+36. Avocado and lentil salad
+    avocado 100g, lentils 120g, spinach 80g,
+    olive oil 8g
+
+37. Sweet potato and spinach soup
+    sweet potato 150g, spinach 100g, garlic 3g,
+    ginger 3g, olive oil 8g
+
+38. Brown rice with salmon and broccoli
+    brown rice 100g, salmon 130g, broccoli 100g,
+    olive oil 8g
+
+39. Chicken quinoa power bowl
+    chicken 150g, quinoa 100g, avocado 60g,
+    spinach 80g, olive oil 8g
+
+40. Lentil and kidney bean stew
+    lentils 100g, kidney beans 100g, spinach 80g,
+    garlic 3g, olive oil 10g
+
+41. Tuna and brown rice bowl
+    tuna 130g, brown rice 100g, spinach 80g,
+    olive oil 8g
+
+42. Egg fried brown rice with vegetables
+    eggs 120g, brown rice 100g, broccoli 80g,
+    spinach 60g, olive oil 8g
+
+43. Grilled mackerel with sweet potato
+    mackerel 150g, sweet potato 120g, spinach 80g,
+    olive oil 8g
+
+44. Sardine and spinach salad
+    sardines 100g, spinach 120g, avocado 60g,
+    olive oil 8g
+
+45. Quinoa and kidney bean salad
+    quinoa 100g, kidney beans 100g, spinach 80g,
+    avocado 60g, olive oil 8g
+
+--- DINNER (25) ---
+46. Baked salmon with sweet potato and spinach
+    salmon 180g, sweet potato 150g, spinach 100g,
+    olive oil 10g
+
+47. Chicken and lentil curry
+    chicken 180g, lentils 150g, spinach 80g,
+    garlic 5g, ginger 5g, olive oil 10g
+
+48. Vegetable and bean stew with brown rice
+    kidney beans 150g, broccoli 100g, spinach 80g,
+    brown rice 100g, garlic 5g, olive oil 10g
+
+49. Grilled mackerel with roasted broccoli and quinoa
+    mackerel 180g, broccoli 150g, quinoa 100g,
+    olive oil 10g
+
+50. Lentil dal with brown rice
+    lentils 180g, brown rice 120g, garlic 5g,
+    ginger 5g, olive oil 10g
+
+51. Baked cod with sweet potato and broccoli
+    cod 180g, sweet potato 150g, broccoli 100g,
+    olive oil 10g
+
+52. Chicken and sweet potato traybake
+    chicken 180g, sweet potato 150g, broccoli 100g,
+    olive oil 10g, garlic 5g
+
+53. Salmon and lentil dinner
+    salmon 180g, lentils 150g, spinach 100g,
+    olive oil 10g, garlic 5g
+
+54. Beef and kidney bean stew
+    kidney beans 150g, broccoli 100g, spinach 80g,
+    sweet potato 100g, olive oil 10g, garlic 5g
+
+55. Grilled trout with quinoa and spinach
+    trout 180g, quinoa 120g, spinach 100g,
+    olive oil 10g
+
+56. Lentil and vegetable curry
+    lentils 180g, sweet potato 120g, spinach 100g,
+    garlic 5g, ginger 5g, olive oil 10g
+
+57. Baked herring with brown rice and broccoli
+    herring 180g, brown rice 120g, broccoli 100g,
+    olive oil 10g
+
+58. Chicken and quinoa dinner bowl
+    chicken 180g, quinoa 120g, broccoli 100g,
+    spinach 80g, olive oil 10g
+
+59. Bean and lentil stew
+    kidney beans 150g, lentils 100g, spinach 100g,
+    garlic 5g, ginger 3g, olive oil 10g
+
+60. Sardine pasta with broccoli
+    sardines 150g, broccoli 120g, spinach 80g,
+    olive oil 10g, garlic 5g
+
+61. Grilled salmon with roasted vegetables
+    salmon 180g, sweet potato 120g, broccoli 100g,
+    spinach 80g, olive oil 10g
+
+62. Chicken and broccoli bake
+    chicken 180g, broccoli 150g, sweet potato 100g,
+    olive oil 10g, garlic 5g
+
+63. Tuna and lentil dinner bowl
+    tuna 150g, lentils 150g, spinach 100g,
+    olive oil 10g
+
+64. Mackerel and sweet potato dinner
+    mackerel 180g, sweet potato 150g, spinach 100g,
+    olive oil 10g
+
+65. Lentil soup with brown rice
+    lentils 180g, brown rice 100g, spinach 80g,
+    garlic 5g, ginger 3g, olive oil 10g
+
+66. Baked chicken with lentils and spinach
+    chicken 180g, lentils 150g, spinach 100g,
+    olive oil 10g, garlic 5g
+
+67. Quinoa and vegetable stew
+    quinoa 120g, kidney beans 120g, broccoli 100g,
+    spinach 80g, olive oil 10g, garlic 5g
+
+68. Herring and quinoa bowl
+    herring 180g, quinoa 120g, spinach 100g,
+    olive oil 10g
+
+69. Cod and lentil dinner
+    cod 180g, lentils 150g, broccoli 100g,
+    olive oil 10g, garlic 5g
+
+70. Trout and sweet potato bake
+    trout 180g, sweet potato 150g, broccoli 100g,
+    olive oil 10g
+
+--- SNACKS (15) ---
+71. Walnuts and blueberries
+    walnuts 30g, blueberries 100g
+
+72. Greek yogurt with ginger
+    greek yogurt 150g, ginger 2g
+
+73. Avocado with olive oil
+    avocado 100g, olive oil 5g
+
+74. Hard boiled egg with spinach
+    eggs 100g, spinach 50g
+
+75. Oat and walnut energy ball
+    oats 50g, walnuts 20g, blueberries 30g
+
+76. Blueberry and walnut mix
+    blueberries 100g, walnuts 25g
+
+77. Greek yogurt with blueberries
+    greek yogurt 150g, blueberries 80g
+
+78. Avocado and egg snack bowl
+    avocado 80g, eggs 80g
+
+79. Walnuts and greek yogurt
+    walnuts 25g, greek yogurt 120g
+
+80. Blueberry oat snack pot
+    blueberries 100g, oats 40g
+
+81. Spinach and egg mini omelette
+    eggs 100g, spinach 60g, olive oil 5g
+
+82. Walnut and avocado bowl
+    walnuts 20g, avocado 80g
+
+83. Ginger greek yogurt pot
+    greek yogurt 150g, ginger 3g, blueberries 50g
+
+84. Oat and blueberry snack pot
+    oats 50g, blueberries 80g, walnuts 15g
+
+85. Avocado and walnut snack
+    avocado 80g, walnuts 25g, olive oil 5g
+
+--- FLARE DAY (15) ---
+86. Plain oat porridge with banana
+    oats 80g, banana 100g
+    effort: low, prep: 5 min
+
+87. Greek yogurt with blueberries
+    greek yogurt 200g, blueberries 80g
+    effort: low, prep: 2 min
+
+88. Soft boiled eggs with avocado
+    eggs 120g, avocado 80g
+    effort: low, prep: 10 min
+
+89. Warm lentil soup no added salt
+    lentils 150g, spinach 80g, olive oil 5g,
+    garlic 2g
+    effort: low, prep: 15 min
+
+90. Steamed broccoli with olive oil
+    broccoli 150g, olive oil 8g
+    effort: low, prep: 10 min
+
+91. Blueberry smoothie with oats
+    blueberries 150g, oats 50g, greek yogurt 100g
+    effort: low, prep: 5 min
+
+92. Plain greek yogurt with ginger
+    greek yogurt 200g, ginger 2g
+    effort: low, prep: 2 min
+
+93. Warm oats with blueberries
+    oats 80g, blueberries 100g
+    effort: low, prep: 5 min
+
+94. Steamed spinach with olive oil and garlic
+    spinach 150g, olive oil 8g, garlic 2g
+    effort: low, prep: 10 min
+
+95. Soft scrambled eggs
+    eggs 150g, olive oil 5g, spinach 50g
+    effort: low, prep: 8 min
+
+96. Avocado mash with olive oil
+    avocado 120g, olive oil 5g
+    effort: low, prep: 3 min
+
+97. Warm lentil and spinach broth
+    lentils 120g, spinach 100g, garlic 2g,
+    ginger 2g, olive oil 5g
+    effort: low, prep: 15 min
+
+98. Blueberry and oat porridge
+    blueberries 100g, oats 80g
+    effort: low, prep: 5 min
+
+99. Steamed sweet potato with olive oil
+    sweet potato 150g, olive oil 8g
+    effort: low, prep: 15 min
+
+100. Greek yogurt with walnuts and ginger
+     greek yogurt 180g, walnuts 20g, ginger 2g
+     effort: low, prep: 2 min
+
+After seeding verify:
+  SELECT meal_type, COUNT(*),
+         ROUND(AVG(anti_inflammatory_score),1) as avg_score,
+         ROUND(AVG(total_calories),0) as avg_calories
+  FROM static.meals
+  GROUP BY meal_type
+  ORDER BY meal_type;
+
+  SELECT COUNT(*) FROM static.meal_ingredients;
+  → expect 200–400 rows
+
+  SELECT COUNT(*) FROM static.meals
+  WHERE is_flare_friendly = true;
+  → expect >= 15
+
+  SELECT COUNT(*) FROM static.meals
+  WHERE is_vegetarian = true;
+  → expect >= 30
+
+Print: ✓ TASK 6 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 7 — BUILD MEAL API ENDPOINTS
+───────────────────────────────────────────────────────────
+
+Write router: app/routers/meals.py
+
+Endpoints (curated meals only — no custom meal
+endpoints this week):
+
+GET /api/v1/meals
+  Query params:
+    meal_type: optional breakfast/lunch/dinner/
+               snack/flare_day
+    is_vegetarian: optional bool
+    is_flare_friendly: optional bool
+    min_score: optional float
+    max_calories: optional int
+    tags: optional comma-separated string
+    limit: default 20, max 50
+    offset: default 0
+  Auth: required
+  Response: paginated list of MealResponse
+  Order: anti_inflammatory_score DESC
+
+GET /api/v1/meals/flare-safe
+  Auth: required
+  Response: is_flare_friendly = true meals
+            ordered by anti_inflammatory_score DESC
+            limit 10
+  Use: flare mode quick endpoint
+
+GET /api/v1/meals/by-tag/{tag}
+  Auth: required
+  Response: meals where tags JSONB contains tag
+  Use: filter by high_protein, vegetarian etc.
+
+GET /api/v1/meals/{meal_id}
+  Auth: required
+  Response: full MealResponse with ingredients
+  Edge case: 404 if not found
+
+ROUTE ORDER — register in this exact order:
+  1. /meals/flare-safe
+  2. /meals/by-tag/{tag}
+  3. /meals/{meal_id}
+  4. /meals (last)
+This prevents /meals/flare-safe being caught
+by /meals/{meal_id} pattern.
+
+Write service: app/services/meal_service.py
+  - get_meals(db, filters, limit, offset)
+  - get_meal_by_id(db, meal_id)
+  - get_flare_safe_meals(db)
+  - get_meals_by_tag(db, tag)
+
+Register router in app/main.py with prefix
+/api/v1
+
+Print: ✓ TASK 7 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 8 — WRITE UNIT TESTS
+───────────────────────────────────────────────────────────
+
+Write: tests/services/test_meal_service.py
+  - get_meals filters by meal_type correctly
+  - get_meals filters by is_vegetarian correctly
+  - get_meals filters by is_flare_friendly correctly
+  - get_meals respects limit and offset
+  - get_meal_by_id returns meal with ingredients
+  - get_meal_by_id raises 404 for unknown ID
+  - get_flare_safe_meals returns only flare meals
+  - get_meals_by_tag returns correct meals
+  - all seeded meals have non-zero calories
+  - all seeded meals have score between 0 and 10
+
+Write: tests/routers/test_meals.py
+  - GET /api/v1/meals returns 200
+  - GET /api/v1/meals?meal_type=breakfast filters correctly
+  - GET /api/v1/meals?is_flare_friendly=true filters
+  - GET /api/v1/meals/{valid_id} returns 200
+  - GET /api/v1/meals/{invalid_id} returns 404
+  - GET /api/v1/meals/flare-safe returns 200
+  - All endpoints return 401 without auth token
+
+Run all tests:
+  pytest tests/ -v
+  → all must pass before Task 9
+
+Print: ✓ TASK 8 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 9 — FULL VERIFICATION
+───────────────────────────────────────────────────────────
+
+Run all queries and save to:
+logs/week4_verification.txt
+
+Query 1 — food catalog final state:
+  SELECT category, cooking_state, COUNT(*),
+         quality_flag
+  FROM static.foods
+  GROUP BY category, cooking_state, quality_flag
+  ORDER BY category;
+
+Query 2 — no calories = 0 remaining:
+  SELECT name, calories FROM static.foods
+  WHERE calories = 0 OR calories IS NULL;
+  → expect 0 rows
+
+Query 3 — meal library summary:
+  SELECT meal_type, COUNT(*),
+         ROUND(AVG(anti_inflammatory_score),1) as avg_score,
+         SUM(CASE WHEN is_vegetarian THEN 1 ELSE 0 END)
+           as veg_count,
+         SUM(CASE WHEN is_flare_friendly THEN 1 ELSE 0 END)
+           as flare_count
+  FROM static.meals
+  GROUP BY meal_type
+  ORDER BY meal_type;
+
+Query 4 — top 10 scoring meals:
+  SELECT name, meal_type, anti_inflammatory_score,
+         is_flare_friendly, is_vegetarian
+  FROM static.meals
+  ORDER BY anti_inflammatory_score DESC
+  LIMIT 10;
+
+Query 5 — ingredient coverage:
+  SELECT COUNT(DISTINCT food_id) as foods_used,
+         COUNT(*) as total_ingredient_rows
+  FROM static.meal_ingredients;
+
+Query 6 — tag distribution:
+  SELECT tag, COUNT(*) as meal_count
+  FROM static.meals,
+       jsonb_array_elements_text(tags) as tag
+  GROUP BY tag
+  ORDER BY meal_count DESC;
+
+Query 7 — custom meal tables exist and are empty:
+  SELECT COUNT(*) FROM tracking.custom_meals;
+  SELECT COUNT(*) FROM tracking.custom_meal_ingredients;
+  → both expect 0 (tables exist, no data yet)
+
+Print: ✓ TASK 9 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 10 — WRITE WEEK 4 SUMMARY
+───────────────────────────────────────────────────────────
+
+Write week4_summary.md covering:
+
+1. Migration 0003 changes
+   - columns added to static.foods
+   - tables created: static.meals,
+     static.meal_ingredients,
+     tracking.custom_meals,
+     tracking.custom_meal_ingredients
+   - note: custom meal endpoints deferred to Week 6
+
+2. Data quality fixes
+   - 5 foods with calories = 0 resolved
+   - manual override values and sources
+   - cooking state coverage
+
+3. Fish catalog expansion
+   - new fish added with omega3 values
+
+4. Meal library
+   - total meals by type
+   - average scores by type
+   - vegetarian and flare-friendly counts
+   - tag distribution
+   - any skipped meals and reason
+
+5. API endpoints built
+   - curated meal endpoints only
+   - note custom meal endpoints deferred to Week 6
+
+6. Test results
+   - total passing
+
+7. Open questions for Week 5 rule engine
+   - how should daily nutrition balance
+     affect next meal scoring?
+   - how should flare state change rankings?
+   - should recommendation pull from curated
+     meals only or also match ingredients?
+
+8. What Week 5 needs
+   - confirmed meal types and tags available
+   - confirmed score range in library
+   - confirmed flare-friendly pool size
+
+═══════════════════════════════════════════════════════════
+EXECUTION RULES
+═══════════════════════════════════════════════════════════
+
+DB CONNECTION:
+- Use existing get_db_session() from app/db/session.py
+- Do NOT rewrite connection logic
+- Same async generator pattern from Week 3
+
+DO NOT OVERWRITE:
+- app/db/session.py
+- app/core/config.py
+- app/core/security.py
+- app/services/food_normalizer.py
+- app/services/anti_inflammatory_scorer.py
+- app/routers/foods.py
+- alembic/versions/0001_initial_schema.py
+- alembic/versions/0002_add_ai_score_to_foods.py
+
+DO NOT BUILD:
+- Custom meal endpoints (deferred to Week 6)
+- Any script that inserts into tracking.custom_meals
+- Any script that inserts into
+  tracking.custom_meal_ingredients
+
+GENERAL:
+- Complete every task fully before moving to next
+- Write and save all files to disk
+- No pseudocode — all code must be runnable
+- Run scripts inside Docker API container
+- Run queries inside Docker DB container
+- Flag design decisions with [DESIGN DECISION: ...]
+- At end of each task print: ✓ TASK [N] COMPLETE
+- When all done print:
+  ✓ WEEK 4 COMPLETE — meal library live,
+  custom meal tables ready for Week 6,
+  endpoints verified, Week 5 ready to begin
+
+Begin now with Task 1.

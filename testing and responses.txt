@@ -1,0 +1,118 @@
+5B
+1. After login: is `ra_refresh` cookie present in DevTools? Y/N
+2. After reload: is `POST /auth/refresh` fired? Y/N
+3. If Y: does the request include the `ra_refresh` cookie? Y/N
+4. Status code of refresh response?
+5. If 401: paste output of `docker compose logs api --tail=50`
+6. Any console errors during reload?
+
+response:
+ra_refresh present in DevTools after login: Y
+POST /auth/refresh fired after reload: Y
+Refresh request included ra_refresh cookie: Y
+Refresh response status: 200
+401 logs: N/A
+Console errors during reload: Yes — one network error for missing favicon:
+Failed to load resource: the server responded with a status of 404 (Not Found) http://localhost:5173/favicon.ico
+I verified this in a headless Edge session against http://localhost:5173 with a real login flow.
+
+manual testing response different scope:
+build a meal is not working the meal is not storing in the meal log when i select the particular items like chicken 
+The app is staying logged in when for now sometimes its behaving differently 
+
+
+#7b:
+1. Log 3 meals as a test user.
+2. Run: curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/v1/logs/food/today | jq
+3. Paste the response.
+
+response:
+{
+  "items": [
+    {
+      "food_id": null,
+      "meal_id": "f8b21276-d9f3-43a2-a3c5-a4f9581a6f22",
+      "recommendation_meal_id": "f8b21276-d9f3-43a2-a3c5-a4f9581a6f22",
+      "custom_meal_id": null,
+      "custom_food_name": null,
+      "meal_type": "lunch",
+      "portion_g": null,
+      "raw_portion_g": null,
+      "portion_label": null,
+      "notes": null,
+      "log_source": "curated_recommendation",
+      "logged_at": "2026-05-02T12:42:42.376318Z",
+      "id": "4f58a2bd-da02-4dc1-83fd-d6eed1af6612",
+      "user_id": "8e7cd84f-509a-4a56-b572-55b47e4b5d9d",
+      "cooking_state_at_log": null,
+      "conversion_factor_at_log": null,
+      "display_calories": "464.10",
+      "display_protein_g": "37.69",
+      "created_at": "2026-05-02T12:42:42.385947Z",
+      "updated_at": "2026-05-02T12:42:42.385947Z"
+    },
+    {
+      "food_id": null,
+      "meal_id": "fe34e891-0688-44cf-b0c0-93bb3f7dc41f",
+      "recommendation_meal_id": "fe34e891-0688-44cf-b0c0-93bb3f7dc41f",
+      "custom_meal_id": null,
+      "custom_food_name": null,
+      "meal_type": "dinner",
+      "portion_g": null,
+      "raw_portion_g": null,
+      "portion_label": null,
+      "notes": null,
+      "log_source": "curated_recommendation",
+      "logged_at": "2026-05-02T12:42:42.441597Z",
+      "id": "2db4a0bf-b145-4bc2-9b45-bab865097bbd",
+      "user_id": "8e7cd84f-509a-4a56-b572-55b47e4b5d9d",
+      "cooking_state_at_log": null,
+      "conversion_factor_at_log": null,
+      "display_calories": "650.75",
+      "display_protein_g": "53.25",
+      "created_at": "2026-05-02T12:42:42.445630Z",
+      "updated_at": "2026-05-02T12:42:42.445630Z"
+    },
+    {
+      "food_id": null,
+      "meal_id": "f03d6a3b-3146-43d3-a2e8-3f0572931fda",
+      "recommendation_meal_id": "f03d6a3b-3146-43d3-a2e8-3f0572931fda",
+      "custom_meal_id": null,
+      "custom_food_name": null,
+      "meal_type": "dinner",
+      "portion_g": null,
+      "raw_portion_g": null,
+      "portion_label": null,
+      "notes": null,
+      "log_source": "curated_recommendation",
+      "logged_at": "2026-05-02T12:42:42.470800Z",
+      "id": "dffe24e9-4bba-450e-8c89-86e5809c35de",
+      "user_id": "8e7cd84f-509a-4a56-b572-55b47e4b5d9d",
+      "cooking_state_at_log": null,
+      "conversion_factor_at_log": null,
+      "display_calories": "991.50",
+      "display_protein_g": "58.60",
+      "created_at": "2026-05-02T12:42:42.473677Z",
+      "updated_at": "2026-05-02T12:42:42.473677Z"
+    }
+  ],
+  "nutrition_summary": {
+    "calories_consumed": 2106.35,
+    "protein_consumed": 149.54,
+    "fiber_consumed": 32.6,
+    "omega3_consumed": 7.55,
+    "is_protein_low": false,
+    "is_fiber_low": false,
+    "is_omega3_low": false,
+    "is_sugar_over": false,
+    "is_sodium_over": false
+  }
+}
+
+3a 
+
+curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/v1/recommendations/next | jq
+
+response:
+{"recommended_meal":{"name":"Grilled salmon with quinoa","meal_type":"lunch","cuisine_type":"general","prep_time_minutes":20,"effort_level":"medium","id":"4fb0e626-6d81-4f70-9657-6a1f3c3ca581","serving_size_description":"1 curated serving","total_calories":"849.50","total_protein_g":"47.01","total_carbs_g":"85.33","total_fat_g":"36.07","total_fiber_g":"8.81","total_sugar_g":"0.00","total_sodium_mg":"170.79","total_omega3_g":"2.480","anti_inflammatory_score":"7.3","is_vegetarian":false,"is_flare_friendly":true,"tags":["anti_inflammatory","fish","high_fiber","high_omega3","high_protein","lunch"],"instructions":"Prepare ingredients simply with minimal added salt. Portion sizes are listed in grams.","ingredients":[{"food_id":"708ff725-0f10-4474
+

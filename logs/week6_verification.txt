@@ -1,0 +1,53 @@
+Query 1 - missing_ingredients table exists:
+SELECT COUNT(*) FROM tracking.missing_ingredients;
+
+Query 2 - status breakdown:
+SELECT status, COUNT(*) FROM tracking.missing_ingredients GROUP BY status ORDER BY status;
+
+Query 3 - custom meal saved:
+SELECT name, total_calories, anti_inflammatory_score, is_vegetarian FROM tracking.custom_meals ORDER BY created_at DESC LIMIT 5;
+
+Query 4 - recommendation mode logged:
+SELECT recommendation_mode, COUNT(*) FROM intelligence.recommendation_logs GROUP BY recommendation_mode ORDER BY recommendation_mode;
+
+Query 5 - food log source breakdown:
+SELECT log_source, COUNT(*) FROM tracking.food_logs GROUP BY log_source ORDER BY log_source;
+
+Query 6 - new foods column:
+SELECT COUNT(*) FROM static.foods WHERE needs_review = true;
+
+ count 
+-------
+     2
+(1 row)
+
+       status       | count 
+--------------------+-------
+ missing_completely |     1
+ user_entered       |     1
+(2 rows)
+
+       name       | total_calories | anti_inflammatory_score | is_vegetarian 
+------------------+----------------+-------------------------+---------------
+ My protein lunch |         291.68 |                     5.9 | f
+(1 row)
+
+ recommendation_mode | count 
+---------------------+-------
+ flare_only          |     1
+ mixed               |     1
+ normal              |     1
+                     |     4
+(4 rows)
+
+ log_source  | count 
+-------------+-------
+ custom_meal |     1
+ manual_log  |     3
+(2 rows)
+
+ count 
+-------
+     0
+(1 row)
+

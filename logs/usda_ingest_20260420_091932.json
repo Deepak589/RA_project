@@ -1,0 +1,23 @@
+{
+  "mode": "full-run",
+  "started_at": "2026-04-20T09:19:30.600870+00:00",
+  "terms": [
+    {
+      "term": "lentils",
+      "data_type": "Foundation",
+      "result_count": 1
+    }
+  ],
+  "foods": [
+    {
+      "term": "lentils",
+      "data_type": "Foundation",
+      "external_id": "2644283",
+      "name": "Lentils, dry",
+      "category": "legume",
+      "anti_inflammatory_score": 6.5,
+      "status": "inserted"
+    }
+  ],
+  "finished_at": "2026-04-20T09:19:32.719120+00:00"
+}

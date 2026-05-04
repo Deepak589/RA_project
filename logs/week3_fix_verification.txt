@@ -1,0 +1,52 @@
+﻿Week 3 fix verification
+Generated: 2026-04-20
+
+Query 1 - lentils fiber and score
+                        name                         | fiber_g | protein_g | anti_inflammatory_score 
+-----------------------------------------------------+---------+-----------+-------------------------
+ Lentils, mature seeds, cooked, boiled, without salt |    7.90 |      9.02 |                     7.5
+ Lentils, mature seeds, cooked, boiled, with salt    |    7.90 |      9.02 |                     7.5
+ Lentils, pink or red, raw                           |   10.80 |     23.90 |                     8.0
+ Lentils, raw                                        |   10.70 |     24.60 |                     8.0
+(4 rows)
+
+
+Query 2 - spinach score
+      name       | fiber_g | anti_inflammatory_score 
+-----------------+---------+-------------------------
+ Spinach, baby   |    1.56 |                     6.5
+ Spinach, mature |    1.59 |                     6.5
+(2 rows)
+
+
+Query 3 - salmon omega3 and score
+                   name                   | omega3_g | anti_inflammatory_score 
+------------------------------------------+----------+-------------------------
+ Fish, salmon, Atlantic, farm raised, raw |    1.610 |                     8.5
+(1 row)
+
+
+Query 4 - chicken calories
+                                        name                                        | calories | anti_inflammatory_score 
+------------------------------------------------------------------------------------+----------+-------------------------
+ Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, braised |   166.00 |                     5.5
+(1 row)
+
+
+Query 5 - top 10 leaderboard
+                        name                         | anti_inflammatory_score 
+-----------------------------------------------------+-------------------------
+ Fish, salmon, Atlantic, farm raised, raw            |                     8.5
+ Lentils, pink or red, raw                           |                     8.0
+ Lentils, raw                                        |                     8.0
+ Beans, Dry, Brown (0% moisture)                     |                     7.5
+ Beans, Dry, Dark Red Kidney (0% moisture)           |                     7.5
+ Beans, Dry, Light Red Kidney (0% moisture)          |                     7.5
+ Flour, potato                                       |                     7.5
+ Lentils, mature seeds, cooked, boiled, without salt |                     7.5
+ Lentils, mature seeds, cooked, boiled, with salt    |                     7.5
+ Spices, ginger, ground                              |                     7.5
+(10 rows)
+
+
+Result: ALL VERIFICATIONS PASSED - ready for week3_summary.md

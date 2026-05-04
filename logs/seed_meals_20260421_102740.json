@@ -1,0 +1,507 @@
+{
+  "started_at": "2026-04-21T10:27:36.450922+00:00",
+  "meals": [
+    {
+      "name": "Oat porridge with blueberries and walnuts",
+      "meal_type": "breakfast",
+      "score": "5.7"
+    },
+    {
+      "name": "Scrambled eggs with spinach",
+      "meal_type": "breakfast",
+      "score": "5.6"
+    },
+    {
+      "name": "Greek yogurt with blueberries and ginger",
+      "meal_type": "breakfast",
+      "score": "5.3"
+    },
+    {
+      "name": "Avocado on whole grain toast with eggs",
+      "meal_type": "breakfast",
+      "score": "5.4"
+    },
+    {
+      "name": "Oat porridge with banana and ginger",
+      "meal_type": "breakfast",
+      "score": "5.6"
+    },
+    {
+      "name": "Blueberry smoothie bowl with oats",
+      "meal_type": "breakfast",
+      "score": "5.5"
+    },
+    {
+      "name": "Scrambled eggs with avocado",
+      "meal_type": "breakfast",
+      "score": "5.4"
+    },
+    {
+      "name": "Greek yogurt with walnuts and blueberries",
+      "meal_type": "breakfast",
+      "score": "5.4"
+    },
+    {
+      "name": "Oats with spinach and eggs (savoury oats)",
+      "meal_type": "breakfast",
+      "score": "5.4"
+    },
+    {
+      "name": "Avocado and walnut bowl",
+      "meal_type": "breakfast",
+      "score": "6.0"
+    },
+    {
+      "name": "Blueberry oat pancakes",
+      "meal_type": "breakfast",
+      "score": "5.4"
+    },
+    {
+      "name": "Greek yogurt with ginger and oats",
+      "meal_type": "breakfast",
+      "score": "5.0"
+    },
+    {
+      "name": "Spinach and egg omelette",
+      "meal_type": "breakfast",
+      "score": "5.6"
+    },
+    {
+      "name": "Warm oats with walnuts and blueberries",
+      "meal_type": "breakfast",
+      "score": "5.7"
+    },
+    {
+      "name": "Avocado and egg breakfast bowl",
+      "meal_type": "breakfast",
+      "score": "5.6"
+    },
+    {
+      "name": "Oats with avocado and olive oil",
+      "meal_type": "breakfast",
+      "score": "5.4"
+    },
+    {
+      "name": "Greek yogurt with blueberries",
+      "meal_type": "breakfast",
+      "score": "5.3"
+    },
+    {
+      "name": "Walnut and blueberry oat bowl",
+      "meal_type": "breakfast",
+      "score": "5.7"
+    },
+    {
+      "name": "Spinach omelette with avocado",
+      "meal_type": "breakfast",
+      "score": "5.7"
+    },
+    {
+      "name": "Ginger oat porridge with blueberries",
+      "meal_type": "breakfast",
+      "score": "5.6"
+    },
+    {
+      "name": "Lentil soup with spinach",
+      "meal_type": "lunch",
+      "score": "7.0"
+    },
+    {
+      "name": "Grilled salmon with brown rice and broccoli",
+      "meal_type": "lunch",
+      "score": "6.9"
+    },
+    {
+      "name": "Chicken breast with quinoa and spinach",
+      "meal_type": "lunch",
+      "score": "6.0"
+    },
+    {
+      "name": "Bean and vegetable stew",
+      "meal_type": "lunch",
+      "score": "7.2"
+    },
+    {
+      "name": "Spinach salad with eggs and avocado",
+      "meal_type": "lunch",
+      "score": "5.8"
+    },
+    {
+      "name": "Lentil and vegetable soup",
+      "meal_type": "lunch",
+      "score": "7.0"
+    },
+    {
+      "name": "Grilled chicken with sweet potato and broccoli",
+      "meal_type": "lunch",
+      "score": "6.0"
+    },
+    {
+      "name": "Quinoa salad with avocado and spinach",
+      "meal_type": "lunch",
+      "score": "6.3"
+    },
+    {
+      "name": "Salmon and lentil bowl",
+      "meal_type": "lunch",
+      "score": "7.6"
+    },
+    {
+      "name": "Brown rice with kidney beans and spinach",
+      "meal_type": "lunch",
+      "score": "6.4"
+    },
+    {
+      "name": "Chicken and broccoli stir fry with brown rice",
+      "meal_type": "lunch",
+      "score": "5.8"
+    },
+    {
+      "name": "Egg and avocado salad with spinach",
+      "meal_type": "lunch",
+      "score": "5.8"
+    },
+    {
+      "name": "Lentil and sweet potato soup",
+      "meal_type": "lunch",
+      "score": "6.8"
+    },
+    {
+      "name": "Grilled salmon with quinoa",
+      "meal_type": "lunch",
+      "score": "7.3"
+    },
+    {
+      "name": "Chicken and kidney bean bowl",
+      "meal_type": "lunch",
+      "score": "6.6"
+    },
+    {
+      "name": "Avocado and lentil salad",
+      "meal_type": "lunch",
+      "score": "6.7"
+    },
+    {
+      "name": "Sweet potato and spinach soup",
+      "meal_type": "lunch",
+      "score": "6.2"
+    },
+    {
+      "name": "Brown rice with salmon and broccoli",
+      "meal_type": "lunch",
+      "score": "6.9"
+    },
+    {
+      "name": "Chicken quinoa power bowl",
+      "meal_type": "lunch",
+      "score": "6.0"
+    },
+    {
+      "name": "Lentil and kidney bean stew",
+      "meal_type": "lunch",
+      "score": "7.3"
+    },
+    {
+      "name": "Tuna and brown rice bowl",
+      "meal_type": "lunch",
+      "score": "5.8"
+    },
+    {
+      "name": "Egg fried brown rice with vegetables",
+      "meal_type": "lunch",
+      "score": "5.7"
+    },
+    {
+      "name": "Grilled mackerel with sweet potato",
+      "meal_type": "lunch",
+      "score": "7.1"
+    },
+    {
+      "name": "Sardine and spinach salad",
+      "meal_type": "lunch",
+      "score": "6.7"
+    },
+    {
+      "name": "Quinoa and kidney bean salad",
+      "meal_type": "lunch",
+      "score": "6.8"
+    },
+    {
+      "name": "Baked salmon with sweet potato and spinach",
+      "meal_type": "dinner",
+      "score": "7.1"
+    },
+    {
+      "name": "Chicken and lentil curry",
+      "meal_type": "dinner",
+      "score": "6.4"
+    },
+    {
+      "name": "Vegetable and bean stew with brown rice",
+      "meal_type": "dinner",
+      "score": "6.7"
+    },
+    {
+      "name": "Grilled mackerel with roasted broccoli and quinoa",
+      "meal_type": "dinner",
+      "score": "7.4"
+    },
+    {
+      "name": "Lentil dal with brown rice",
+      "meal_type": "dinner",
+      "score": "6.5"
+    },
+    {
+      "name": "Baked cod with sweet potato and broccoli",
+      "meal_type": "dinner",
+      "score": "6.2"
+    },
+    {
+      "name": "Chicken and sweet potato traybake",
+      "meal_type": "dinner",
+      "score": "6.0"
+    },
+    {
+      "name": "Salmon and lentil dinner",
+      "meal_type": "dinner",
+      "score": "7.6"
+    },
+    {
+      "name": "Beef and kidney bean stew",
+      "meal_type": "dinner",
+      "score": "7.0"
+    },
+    {
+      "name": "Grilled trout with quinoa and spinach",
+      "meal_type": "dinner",
+      "score": "7.3"
+    },
+    {
+      "name": "Lentil and vegetable curry",
+      "meal_type": "dinner",
+      "score": "6.8"
+    },
+    {
+      "name": "Baked herring with brown rice and broccoli",
+      "meal_type": "dinner",
+      "score": "7.0"
+    },
+    {
+      "name": "Chicken and quinoa dinner bowl",
+      "meal_type": "dinner",
+      "score": "6.2"
+    },
+    {
+      "name": "Bean and lentil stew",
+      "meal_type": "dinner",
+      "score": "7.3"
+    },
+    {
+      "name": "Sardine pasta with broccoli",
+      "meal_type": "dinner",
+      "score": "7.0"
+    },
+    {
+      "name": "Grilled salmon with roasted vegetables",
+      "meal_type": "dinner",
+      "score": "7.2"
+    },
+    {
+      "name": "Chicken and broccoli bake",
+      "meal_type": "dinner",
+      "score": "6.1"
+    },
+    {
+      "name": "Tuna and lentil dinner bowl",
+      "meal_type": "dinner",
+      "score": "6.6"
+    },
+    {
+      "name": "Mackerel and sweet potato dinner",
+      "meal_type": "dinner",
+      "score": "7.1"
+    },
+    {
+      "name": "Lentil soup with brown rice",
+      "meal_type": "dinner",
+      "score": "6.5"
+    },
+    {
+      "name": "Baked chicken with lentils and spinach",
+      "meal_type": "dinner",
+      "score": "6.4"
+    },
+    {
+      "name": "Quinoa and vegetable stew",
+      "meal_type": "dinner",
+      "score": "7.0"
+    },
+    {
+      "name": "Herring and quinoa bowl",
+      "meal_type": "dinner",
+      "score": "7.3"
+    },
+    {
+      "name": "Cod and lentil dinner",
+      "meal_type": "dinner",
+      "score": "6.7"
+    },
+    {
+      "name": "Trout and sweet potato bake",
+      "meal_type": "dinner",
+      "score": "7.2"
+    },
+    {
+      "name": "Walnuts and blueberries",
+      "meal_type": "snack",
+      "score": "6.1"
+    },
+    {
+      "name": "Greek yogurt with ginger",
+      "meal_type": "snack",
+      "score": "5.0"
+    },
+    {
+      "name": "Avocado with olive oil",
+      "meal_type": "snack",
+      "score": "5.9"
+    },
+    {
+      "name": "Hard boiled egg with spinach",
+      "meal_type": "snack",
+      "score": "5.5"
+    },
+    {
+      "name": "Oat and walnut energy ball",
+      "meal_type": "snack",
+      "score": "5.6"
+    },
+    {
+      "name": "Blueberry and walnut mix",
+      "meal_type": "snack",
+      "score": "6.1"
+    },
+    {
+      "name": "Greek yogurt with blueberries",
+      "meal_type": "snack",
+      "score": "5.3"
+    },
+    {
+      "name": "Avocado and egg snack bowl",
+      "meal_type": "snack",
+      "score": "5.5"
+    },
+    {
+      "name": "Walnuts and greek yogurt",
+      "meal_type": "snack",
+      "score": "5.3"
+    },
+    {
+      "name": "Blueberry oat snack pot",
+      "meal_type": "snack",
+      "score": "5.7"
+    },
+    {
+      "name": "Spinach and egg mini omelette",
+      "meal_type": "snack",
+      "score": "5.5"
+    },
+    {
+      "name": "Walnut and avocado bowl",
+      "meal_type": "snack",
+      "score": "6.1"
+    },
+    {
+      "name": "Ginger greek yogurt pot",
+      "meal_type": "snack",
+      "score": "5.3"
+    },
+    {
+      "name": "Oat and blueberry snack pot",
+      "meal_type": "snack",
+      "score": "5.7"
+    },
+    {
+      "name": "Avocado and walnut snack",
+      "meal_type": "snack",
+      "score": "6.0"
+    },
+    {
+      "name": "Plain oat porridge with banana",
+      "meal_type": "flare_day",
+      "score": "5.6"
+    },
+    {
+      "name": "Greek yogurt with blueberries",
+      "meal_type": "flare_day",
+      "score": "5.3"
+    },
+    {
+      "name": "Soft boiled eggs with avocado",
+      "meal_type": "flare_day",
+      "score": "5.4"
+    },
+    {
+      "name": "Warm lentil soup no added salt",
+      "meal_type": "flare_day",
+      "score": "7.1"
+    },
+    {
+      "name": "Steamed broccoli with olive oil",
+      "meal_type": "flare_day",
+      "score": "6.9"
+    },
+    {
+      "name": "Blueberry smoothie with oats",
+      "meal_type": "flare_day",
+      "score": "5.5"
+    },
+    {
+      "name": "Plain greek yogurt with ginger",
+      "meal_type": "flare_day",
+      "score": "5.0"
+    },
+    {
+      "name": "Warm oats with blueberries",
+      "meal_type": "flare_day",
+      "score": "5.6"
+    },
+    {
+      "name": "Steamed spinach with olive oil and garlic",
+      "meal_type": "flare_day",
+      "score": "6.4"
+    },
+    {
+      "name": "Soft scrambled eggs",
+      "meal_type": "flare_day",
+      "score": "5.4"
+    },
+    {
+      "name": "Avocado mash with olive oil",
+      "meal_type": "flare_day",
+      "score": "5.9"
+    },
+    {
+      "name": "Warm lentil and spinach broth",
+      "meal_type": "flare_day",
+      "score": "7.0"
+    },
+    {
+      "name": "Blueberry and oat porridge",
+      "meal_type": "flare_day",
+      "score": "5.6"
+    },
+    {
+      "name": "Steamed sweet potato with olive oil",
+      "meal_type": "flare_day",
+      "score": "5.9"
+    },
+    {
+      "name": "Greek yogurt with walnuts and ginger",
+      "meal_type": "flare_day",
+      "score": "5.2"
+    }
+  ],
+  "missing_ingredients": [],
+  "finished_at": "2026-04-21T10:27:40.728446+00:00"
+}

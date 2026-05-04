@@ -1,0 +1,130 @@
+{
+  "started_at": "2026-04-21T09:59:32.927265+00:00",
+  "terms": [
+    {
+      "term": "tuna cooked",
+      "data_type": "Foundation",
+      "result_count": 3
+    },
+    {
+      "term": "tuna canned in water",
+      "data_type": "Foundation",
+      "result_count": 3
+    },
+    {
+      "term": "sardines canned in oil",
+      "data_type": "Foundation",
+      "result_count": 3
+    },
+    {
+      "term": "mackerel cooked",
+      "data_type": "Foundation",
+      "result_count": 3
+    },
+    {
+      "term": "cod cooked",
+      "data_type": "Foundation",
+      "result_count": 3
+    },
+    {
+      "term": "trout cooked",
+      "data_type": "Foundation",
+      "result_count": 3
+    },
+    {
+      "term": "herring cooked",
+      "data_type": "Foundation",
+      "result_count": 3
+    }
+  ],
+  "foods": [
+    {
+      "term": "tuna cooked",
+      "data_type": "Foundation",
+      "external_id": "2747673",
+      "name": "Tuna, ahi or yellowfin, frozen, wild caught",
+      "omega3_g": 0.0,
+      "anti_inflammatory_score": 6.5,
+      "status": "inserted"
+    },
+    {
+      "term": "tuna canned in water",
+      "data_type": "Foundation",
+      "external_id": "334194",
+      "name": "Fish, tuna, light, canned in water, drained solids",
+      "omega3_g": 0.228,
+      "anti_inflammatory_score": 6.0,
+      "status": "inserted"
+    },
+    {
+      "term": "sardines canned in oil",
+      "external_id": "2747652",
+      "name": "Anchovies, canned in olive oil, with salt, drained",
+      "status": "skipped_duplicate"
+    },
+    {
+      "term": "sardines canned in oil",
+      "data_type": "Foundation",
+      "external_id": "2685582",
+      "name": "Tomato, puree, canned",
+      "omega3_g": 0.0,
+      "anti_inflammatory_score": 6.5,
+      "status": "inserted"
+    },
+    {
+      "term": "mackerel cooked",
+      "data_type": "Foundation",
+      "external_id": "749420",
+      "name": "Pork, cured, bacon, cooked, restaurant",
+      "omega3_g": 0.334,
+      "anti_inflammatory_score": 5.0,
+      "status": "inserted"
+    },
+    {
+      "term": "cod cooked",
+      "data_type": "Foundation",
+      "external_id": "2747654",
+      "name": "Cod, Pacific or Alaskan, frozen, wild caught",
+      "omega3_g": 0.0,
+      "anti_inflammatory_score": 5.5,
+      "status": "inserted"
+    },
+    {
+      "term": "trout cooked",
+      "external_id": "749420",
+      "name": "Pork, cured, bacon, cooked, restaurant",
+      "status": "skipped_duplicate"
+    },
+    {
+      "term": "trout cooked",
+      "data_type": "Foundation",
+      "external_id": "326196",
+      "name": "Kale, frozen, cooked, boiled, drained, without salt",
+      "omega3_g": 0.0,
+      "anti_inflammatory_score": 6.0,
+      "status": "inserted"
+    },
+    {
+      "term": "herring cooked",
+      "external_id": "749420",
+      "name": "Pork, cured, bacon, cooked, restaurant",
+      "status": "skipped_duplicate"
+    },
+    {
+      "term": "herring cooked",
+      "external_id": "326196",
+      "name": "Kale, frozen, cooked, boiled, drained, without salt",
+      "status": "skipped_duplicate"
+    },
+    {
+      "term": "herring cooked",
+      "data_type": "Foundation",
+      "external_id": "746779",
+      "name": "Sausage, breakfast sausage, beef, pre-cooked, unprepared",
+      "omega3_g": 0.135,
+      "anti_inflammatory_score": 3.5,
+      "status": "inserted"
+    }
+  ],
+  "finished_at": "2026-04-21T09:59:40.456905+00:00"
+}

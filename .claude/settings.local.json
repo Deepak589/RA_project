@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm test *)",
+      "Bash(npx *)",
+      "Bash(pytest *)",
+      "Bash(ruff *)",
+      "Bash(alembic upgrade *)",
+      "Bash(alembic current)",
+      "Bash(alembic history *)",
+      "Bash(docker compose ps)",
+      "Bash(docker compose logs *)",
+      "Bash(docker compose up *)",
+      "Bash(docker compose restart *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(jq *)",
+      "Bash(graphify *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(alembic downgrade base*)",
+      "Bash(docker volume rm *)",
+      "Bash(docker compose down -v*)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard origin*)",
+      "Bash(psql * -c \"DROP*)",
+      "Bash(psql * -c \"TRUNCATE*)"
+    ]
+  }
+}
