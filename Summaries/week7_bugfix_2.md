@@ -5,6 +5,10 @@
 Second bug-fix pass targeting 5 issues across the meal display pipeline, UI state management,
 analytics accuracy, and the lifestyle-to-recommendation signal chain.
 
+Update on 2026-05-04: verified an additional Today&apos;s Logs rendering fix for duplicate meal
+entries. The frontend is using the unique `tracking.food_logs.id` value as the React key for
+today-log rows, which prevents duplicate logs of the same meal from collapsing into one item.
+
 ---
 
 ## 2. Bugs Fixed
@@ -107,6 +111,25 @@ on `recommendation_mode` selection.
 
 ---
 
+### BUG 6 — Logging the same meal twice only shows one entry in Today&apos;s Logs
+
+**Root cause:** Earlier versions of the Today&apos;s Logs render path used `meal_id` /
+`recommendation_meal_id` as the React list key. Those IDs are shared by repeated logs of the
+same curated meal, so React reused the same row instead of rendering both log entries.
+
+**Verification status in current frontend source:**
+
+- `frontend/src/pages/MealLogPage.jsx`
+  - Today&apos;s Logs rows render with `key={log.id}`
+- `frontend/src/pages/CustomMealPage.jsx`
+  - Today&apos;s Logs rows render with `key={log.id}`
+- `testing and responses.txt`
+  - Confirmed `GET /api/v1/logs/food/today` already returns a unique `"id"` field per entry
+- Backend
+  - No change needed; the API contract already exposes the correct unique log UUID
+
+---
+
 ## 3. Tests
 
 - `tests/services/test_variety_penalty.py` — 7 unit tests + 1 integration test (added in bugfix pass 1, verified here)
@@ -117,15 +140,20 @@ on `recommendation_mode` selection.
 ## 4. Build Verification
 
 - `npm run build` in `frontend/` — clean build, no errors, no type errors
-  - Output: `dist/assets/index-CP5Gg6VU.js 680.93 kB` (chunk size warning only, not an error)
+  - 2026-05-04 output: `dist/assets/index-DQwNdOoH.js 682.14 kB`
+  - Chunk size warning only; build completed successfully
 - `docker exec ra_project-api-1 pytest tests/ -v` — 95/95 passed, no regressions
 
 ---
 
 ## 5. Graph Update
 
-- `graphify update .` ran after all changes
-- Graph rebuilt: **719 nodes, 1399 edges, 69 communities**
+- Attempted to run `graphify update .` on 2026-05-04
+- Blocked in this environment because the available `graphify` npm package does not expose the
+  repo&apos;s expected CLI binary
+- Existing checked-in graph output remains the latest available snapshot:
+  - `graphify-out/GRAPH_REPORT.md` timestamp: 2026-05-03
+  - Snapshot metrics: **719 nodes, 1399 edges, 69 communities**
 
 ---
 
@@ -144,5 +172,6 @@ User saves LifestyleLog (sleep_hours, stress_level, medication_taken)
 ---
 
 ✓ WEEK 7 BUG FIX PASS 2 COMPLETE — meal ingredient display, saved-meal UX state,
-analytics acceptance rate denominator, and lifestyle-to-recommendation signal chain
-are all fixed and verified (95/95 tests, frontend build clean)
+analytics acceptance rate denominator, lifestyle-to-recommendation signal chain,
+and duplicate Today&apos;s Logs rendering are verified; frontend build is clean and the
+remaining graph-refresh issue is environmental rather than application code
