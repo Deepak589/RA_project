@@ -14,6 +14,14 @@ frontend. Custom meal saves now target the corrected backend route, the custom m
 stale draft state when a new UTC day begins, and both recommendation cards and custom meal log
 rows render ingredients with wrapped tokens instead of a single truncated line.
 
+Latest update on 2026-05-04: corrected the custom meal creation payload shape so ingredient
+quantities are sent as `portion_g` and the custom meal request includes `meal_type`, matching the
+current backend expectation for the `/api/v1/meals/custom` endpoint.
+
+Latest backend update on 2026-05-04: adjusted dietary preference handling in
+`app/services/rule_engine.py` so `"no_preference"` no longer triggers dietary filtering when it
+appears alongside other flags. The dietary filter now applies only when a real preference exists.
+
 ---
 
 ## 2. Bugs Fixed
@@ -166,10 +174,47 @@ which hid later ingredients on narrower screens and reduced scanability.
 
 ---
 
+### BUG 9 — Custom meal create payload field mismatch
+
+**Root cause:** `CustomMealPage.jsx` was still sending ingredient quantities as `grams` and was
+not including `meal_type` in the custom meal create request body, which no longer matched the
+backend contract expected by `/api/v1/meals/custom`.
+
+**Files changed:**
+
+- `frontend/src/pages/CustomMealPage.jsx`
+  - Changed custom meal ingredient payload entries from `{ food_id, grams }` to
+    `{ food_id, portion_g }`
+  - Added `meal_type: mealType` to the `/api/v1/meals/custom` POST body
+
+---
+
+### BUG 10 — `"no_preference"` still triggers dietary filtering
+
+**Root cause:** `_apply_preferences` in `app/services/rule_engine.py` treated any non-empty
+dietary flag list as active, even when the user included `"no_preference"`. That let the presence
+of `"no_preference"` participate in filtering logic instead of bypassing dietary preference
+filtering entirely.
+
+**Files changed:**
+
+- `app/services/rule_engine.py`
+  - Added `has_real_preference = bool(active_dietary_flags) and "no_preference" not in flags`
+  - Changed the dietary filter gate from `if active_dietary_flags:` to
+    `if has_real_preference:`
+
+---
+
 ## 3. Tests
 
 - `tests/services/test_variety_penalty.py` — 7 unit tests + 1 integration test (added in bugfix pass 1, verified here)
-- All 95 tests passed: `pytest tests/ -v` → `95 passed, 2 warnings`
+- Latest verification attempt on 2026-05-04:
+  - `venv\Scripts\python.exe -m pytest tests/`
+  - Result: `20 failed, 74 passed, 1 error`
+  - Failure mode was environmental, not syntax-related: the test run could not resolve the
+    Postgres host `db:5432` (`socket.gaierror: [Errno 11001] getaddrinfo failed`)
+- Earlier verified run in a working DB-backed environment:
+  - `95 passed, 2 warnings`
 
 ---
 
@@ -177,10 +222,11 @@ which hid later ingredients on narrower screens and reduced scanability.
 
 - `npm run build` in `frontend/` — clean build, no errors, no type errors
   - 2026-05-04 latest verified rerun:
-    - `dist/assets/index-C95emtMf.js 682.70 kB`
+    - `dist/assets/index-BvvbcSAi.js 682.71 kB`
     - `dist/assets/index-Billdmla.css 16.94 kB`
-    - build completed in `5.11s`
-  - Earlier 2026-05-04 verified output in this bugfix session:
+    - build completed in `9.33s`
+  - Earlier 2026-05-04 verified outputs in this bugfix session:
+    - `dist/assets/index-C95emtMf.js 682.70 kB` after the `MealCard.jsx` ingredient layout update
     - `dist/assets/index-Cx8gaaI7.js 682.48 kB` after `CustomMealPage.jsx` updates
   - Chunk size warning only; builds completed successfully
 - `docker exec ra_project-api-1 pytest tests/ -v` — 95/95 passed, no regressions
@@ -189,7 +235,9 @@ which hid later ingredients on narrower screens and reduced scanability.
 
 ## 5. Graph Update
 
-- Attempted to run `graphify update .` on 2026-05-04
+- Retried `graphify update .` on 2026-05-04
+- Latest failure remained:
+  - `npm ERR! could not determine executable to run`
 - Still blocked in this environment because the repo hook expects
   `node_modules/.bin/graphify`, but that executable is not present in this workspace
 - Confirmed `frontend/node_modules/.bin` also does not contain a `graphify` binary
@@ -217,5 +265,6 @@ User saves LifestyleLog (sleep_hours, stress_level, medication_taken)
 ✓ WEEK 7 BUG FIX PASS 2 COMPLETE — meal ingredient display, saved-meal UX state,
 analytics acceptance rate denominator, lifestyle-to-recommendation signal chain,
 duplicate Today&apos;s Logs rendering, custom meal route correction, day-rollover draft reset,
-and wrapped ingredient presentation are verified; frontend builds are clean and the remaining
-graph-refresh issue is environmental rather than application code
+wrapped ingredient presentation, custom meal payload contract alignment, and preference-filter
+gating are implemented; frontend builds are clean, while current test and graph-refresh blockers
+are environmental rather than application-code failures

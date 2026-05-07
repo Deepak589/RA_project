@@ -52,6 +52,17 @@ async def test_get_meals_respects_limit_and_offset() -> None:
 
 
 @pytest.mark.asyncio
+async def test_get_meals_filters_by_q_and_orders_by_name() -> None:
+    async with AsyncSessionLocal() as db:
+        meals, total = await get_meals(db, q="salad", limit=50)
+
+    assert total == len(meals)
+    assert meals
+    assert all("salad" in meal.name.lower() for meal in meals)
+    assert [meal.name for meal in meals] == sorted(meal.name for meal in meals)
+
+
+@pytest.mark.asyncio
 async def test_get_meal_by_id_returns_meal_with_ingredients() -> None:
     async with AsyncSessionLocal() as db:
         meals, _ = await get_meals(db, limit=1)

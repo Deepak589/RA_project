@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 from dataclasses import asdict, dataclass
 from datetime import datetime, time, timedelta, timezone
 from uuid import UUID
@@ -65,9 +66,6 @@ async def get_next_meal_recommendation(
     if not candidates:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No meals remain after allergy filtering")
 
-    for meal in candidates:
-        setattr(meal, "adjusted_score", _score(meal))
-
     medications = await get_user_medications(db, user_id)
     medication_result = apply_medication_filter(candidates, medications)
     candidates = medication_result.filtered_meals
@@ -77,7 +75,11 @@ async def get_next_meal_recommendation(
     if medication_result.applied_rules and medication_result.applied_rules[0].startswith("[VERIFY") is False:
         dominant_rule = "medication"
 
-    recommendation_mode = "flare_only" if flare_active else await get_recommendation_mode(db, user_id)
+    if flare_active:
+        recommendation_mode = "flare_only"
+        logs.append("[QUERY: flare_active=true → flare_only mode]")
+    else:
+        recommendation_mode = await get_recommendation_mode(db, user_id)
 
     # Lifestyle override — poor sleep or high stress escalates mode toward flare_only
     lifestyle = await get_todays_lifestyle(db, user_id)
@@ -285,16 +287,11 @@ def _apply_preferences(meals: list[Meal], preferences: UserPreferences | None) -
     goals = [flag.lower() for flag in (getattr(preferences, "goal_flags_jsonb", None) or [])]
     changed = False
     active_dietary_flags = [flag for flag in flags if flag not in {"no_preference"}]
-    if active_dietary_flags:
-        filtered = [meal for meal in meals if _meal_matches_dietary_flags(meal, active_dietary_flags)]
-        if filtered:
-            meals[:] = filtered
-            changed = True
-        else:
-            for meal in meals:
-                if not _meal_matches_dietary_flags(meal, active_dietary_flags):
-                    _bump(meal, -2.0)
-                    changed = True
+    has_real_preference = bool(active_dietary_flags) and "no_preference" not in flags
+    if has_real_preference:
+        original_count = len(meals)
+        meals[:] = [meal for meal in meals if _meal_matches_dietary_flags(meal, active_dietary_flags)]
+        changed = len(meals) != original_count
     for meal in meals:
         if meal.cuisine_type and meal.cuisine_type.lower() in flags:
             _bump(meal, 0.5)
@@ -352,14 +349,30 @@ def apply_variety_penalty(score: float, meal_id: str, recent_ids: list[str]) -> 
 
 
 def _final_rank(meals: list[Meal], recommendation_mode: str) -> list[Meal]:
+    def shuffled(items: list[Meal]) -> list[Meal]:
+        ranked = list(items)
+        random.shuffle(ranked)
+        return ranked
+
+    def shuffle_by_priority(items: list[Meal]) -> list[Meal]:
+        buckets: dict[float, list[Meal]] = {}
+        for meal in items:
+            buckets.setdefault(_priority_delta(meal), []).append(meal)
+
+        ranked: list[Meal] = []
+        for priority in sorted(buckets.keys(), reverse=True):
+            ranked.extend(shuffled(buckets[priority]))
+        return ranked
+
     if recommendation_mode == "flare_only":
-        return sorted(meals, key=lambda meal: (not meal.is_flare_friendly, -_score(meal), meal.name))
+        flare_meals = [meal for meal in meals if meal.is_flare_friendly]
+        other_meals = [meal for meal in meals if not meal.is_flare_friendly]
+        return shuffle_by_priority(flare_meals) + shuffle_by_priority(other_meals)
     if recommendation_mode == "mixed":
-        ranked = sorted(meals, key=lambda meal: (-_score(meal), meal.name))
-        flare_meals = [meal for meal in ranked if meal.is_flare_friendly]
-        normal_meals = [meal for meal in ranked if not meal.is_flare_friendly]
-        return flare_meals[:2] + normal_meals[:3] + flare_meals[2:] + normal_meals[3:]
-    return sorted(meals, key=lambda meal: (-_score(meal), meal.name))
+        flare_meals = [meal for meal in meals if meal.is_flare_friendly]
+        normal_meals = [meal for meal in meals if not meal.is_flare_friendly]
+        return shuffle_by_priority(flare_meals) + shuffle_by_priority(normal_meals)
+    return shuffle_by_priority(meals)
 
 
 def _ensure_minimum_alternatives(
@@ -443,6 +456,12 @@ def _build_explanation(meal: Meal, rule: str, flare_active: bool, gaps: Nutritio
 
 def _score(meal: Meal) -> float:
     return float(getattr(meal, "adjusted_score", meal.anti_inflammatory_score or 0))
+
+
+def _priority_delta(meal: Meal) -> float:
+    if not hasattr(meal, "adjusted_score"):
+        return 0.0
+    return round(float(getattr(meal, "adjusted_score", 0.0)) - float(meal.anti_inflammatory_score or 0), 6)
 
 
 def _bump(meal: Meal, delta: float) -> None:

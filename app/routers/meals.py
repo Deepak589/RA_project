@@ -47,6 +47,7 @@ async def get_meal_endpoint(
 @router.get("/", response_model=MealSearchResponse)
 async def get_meals_endpoint(
     meal_type: str | None = Query(default=None),
+    q: str | None = Query(default=None),
     is_vegetarian: bool | None = Query(default=None),
     is_flare_friendly: bool | None = Query(default=None),
     min_score: float | None = Query(default=None, ge=0, le=10),
@@ -68,5 +69,6 @@ async def get_meals_endpoint(
         tags=tag_list,
         limit=limit,
         offset=offset,
+        q=q,
     )
     return MealSearchResponse(items=meals, total=total, limit=limit, offset=offset)

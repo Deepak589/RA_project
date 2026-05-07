@@ -1,12 +1,12 @@
-# Graph Report - C:\Users\Deepak\RA_project  (2026-05-03)
+# Graph Report - C:\Users\Deepak\RA_project  (2026-05-07)
 
 ## Corpus Check
-- 138 files · ~75,942 words
+- 138 files · ~80,164 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 719 nodes · 1399 edges · 69 communities detected
-- Extraction: 61% EXTRACTED · 39% INFERRED · 0% AMBIGUOUS · INFERRED: 539 edges (avg confidence: 0.7)
+- 724 nodes · 1411 edges · 69 communities detected
+- Extraction: 61% EXTRACTED · 39% INFERRED · 0% AMBIGUOUS · INFERRED: 546 edges (avg confidence: 0.7)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -81,8 +81,8 @@
 - [[_COMMUNITY_Community 68|Community 68]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Select()` - 46 edges
-2. `get_next_meal_recommendation()` - 24 edges
+1. `Select()` - 47 edges
+2. `get_next_meal_recommendation()` - 26 edges
 3. `main()` - 24 edges
 4. `FoodLog` - 23 edges
 5. `Meal` - 22 edges
@@ -111,40 +111,40 @@
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.09
-Nodes (49): Base, Base, get_today_dashboard(), TodayDashboard, WeeklyDashboard, DeclarativeBase, AccountDeletionStatus, MissingIngredientStatus (+41 more)
+Cohesion: 0.05
+Nodes (64): BaseModel, CustomMealCalculateRequest, CustomMealCreateRequest, CustomMealIngredientInput, CustomMealIngredientResponse, CustomMealNutrients, CustomMealResponse, FoodBase (+56 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.06
-Nodes (56): BaseModel, FoodBase, FoodCreate, FoodResponse, MealBase, MealCreate, MealItemBase, MealItemCreate (+48 more)
+Cohesion: 0.09
+Nodes (47): Base, Base, TodayDashboard, WeeklyDashboard, DeclarativeBase, AccountDeletionStatus, MissingIngredientStatus, Food (+39 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.07
-Nodes (49): _clean_text(), _extract_nutrient_id(), _extract_nutrients(), _extract_serving_size_g(), map_usda_category(), normalize_usda_food(), _to_decimal(), _to_int() (+41 more)
-
-### Community 3 - "Community 3"
 Cohesion: 0.06
 Nodes (34): change_password(), _issue_tokens(), _load_user(), login(), logout(), refresh(), register(), update_me() (+26 more)
 
+### Community 3 - "Community 3"
+Cohesion: 0.08
+Nodes (42): _clean_text(), _extract_nutrient_id(), _extract_nutrients(), _extract_serving_size_g(), map_usda_category(), normalize_usda_food(), _to_decimal(), _to_int() (+34 more)
+
 ### Community 4 - "Community 4"
-Cohesion: 0.07
-Nodes (48): CustomMealCalculateRequest, CustomMealCreateRequest, CustomMealIngredientInput, CustomMealIngredientResponse, CustomMealListResponse, CustomMealNutrients, CustomMealResponse, _build_tags() (+40 more)
+Cohesion: 0.09
+Nodes (40): CustomMealListResponse, _build_tags(), calculate_custom_meal(), create_custom_meal(), delete_custom_meal(), _easy_foods(), get_custom_meal_by_id(), get_custom_meals() (+32 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.1
-Nodes (26): get_weekly_dashboard_endpoint(), _avg(), detect_meal_type_by_time(), generate_weekly_insights(), get_weekly_dashboard(), get_user_medications(), get_todays_nutrition(), _apply_nutrition_boosts() (+18 more)
+Cohesion: 0.06
+Nodes (24): AnalyticsPage(), CustomMealLogItem(), CustomMealPage(), DashboardPage(), FoodLogItem(), currentMealType(), formatDate(), formatTime() (+16 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.06
-Nodes (21): AnalyticsPage(), DashboardPage(), FoodLogItem(), currentMealType(), formatDate(), formatTime(), greeting(), number() (+13 more)
+Cohesion: 0.13
+Nodes (32): get_today_dashboard_endpoint(), TodayDashboardResponse, WeeklyDashboardResponse, Enum, FlareLevel, MealType, RecommendationFeedbackStatus, FoodLogBase (+24 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.13
-Nodes (31): get_today_dashboard_endpoint(), TodayDashboardResponse, WeeklyDashboardResponse, Enum, FlareLevel, MealType, RecommendationFeedbackStatus, FoodLogBase (+23 more)
+Cohesion: 0.12
+Nodes (30): calculate_anti_inflammatory_score(), _decimal_attr(), dry_run(), fetch_foods(), _fetch_foods_by_data_type(), full_run(), _json_decimal(), main() (+22 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.15
-Nodes (25): calculate_anti_inflammatory_score(), _decimal_attr(), dry_run(), fetch_foods(), _fetch_foods_by_data_type(), full_run(), _json_decimal(), main() (+17 more)
+Cohesion: 0.12
+Nodes (29): get_weekly_dashboard_endpoint(), _avg(), detect_meal_type_by_time(), generate_weekly_insights(), get_today_dashboard(), get_weekly_dashboard(), get_user_medications(), get_todays_nutrition() (+21 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.13
@@ -155,8 +155,8 @@ Cohesion: 0.1
 Nodes (25): Graphify Extraction Instructions, Curated meal library, React + Vite / FastAPI / PostgreSQL stack, recommendation_logs table, Rule-based baseline comparison, Sparse data makes ML look impressive but perform poorly, Supportive lifestyle tool boundary, USDA FoodData Central API (+17 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.16
-Nodes (18): MealSearchResponse, _apply_meal_filters(), get_flare_safe_meals(), get_meal_by_id(), get_meals(), get_meals_by_tag(), get_flare_safe_meals_endpoint(), get_meal_endpoint() (+10 more)
+Cohesion: 0.15
+Nodes (19): MealSearchResponse, _apply_meal_filters(), get_flare_safe_meals(), get_meal_by_id(), get_meals(), get_meals_by_tag(), get_flare_safe_meals_endpoint(), get_meal_endpoint() (+11 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.12
@@ -179,64 +179,64 @@ Cohesion: 0.47
 Nodes (8): _auth_headers(), test_login_sets_refresh_cookie(), test_patch_symptoms_today_creates_log_when_missing(), test_patch_symptoms_today_sets_escalation_when_pain_is_high(), test_patch_symptoms_today_updates_existing_log(), test_refresh_accepts_cookie_and_rotates_refresh_session(), test_register_duplicate_email_returns_structured_409(), _unique_email()
 
 ### Community 17 - "Community 17"
+Cohesion: 0.25
+Nodes (0): 
+
+### Community 18 - "Community 18"
+Cohesion: 0.46
+Nodes (7): _display_note(), _factor_for(), _json_decimal(), main(), _now_iso(), _save_report(), _state_for()
+
+### Community 19 - "Community 19"
 Cohesion: 0.29
 Nodes (1): Service layer package.
 
-### Community 18 - "Community 18"
+### Community 20 - "Community 20"
 Cohesion: 0.47
 Nodes (5): downgrade(), _extend_static_meals(), meal library and food metadata  Revision ID: 0004_meal_library Revises: 0003_foo, _remove_static_meal_columns(), upgrade()
 
-### Community 19 - "Community 19"
-Cohesion: 0.4
-Nodes (3): AuthProvider(), configureApiAuth(), configureApiToken()
-
-### Community 20 - "Community 20"
-Cohesion: 0.6
-Nodes (5): _json_decimal(), main(), _now_iso(), rescore_foods(), _save_report()
-
 ### Community 21 - "Community 21"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (3): AuthProvider(), configureApiAuth(), configureApiToken()
 
 ### Community 22 - "Community 22"
 Cohesion: 0.4
 Nodes (0): 
 
 ### Community 23 - "Community 23"
-Cohesion: 0.5
-Nodes (1): initial schema  Revision ID: 0001_initial_schema Revises: Create Date: 2026-04-1
+Cohesion: 0.4
+Nodes (0): 
 
 ### Community 24 - "Community 24"
 Cohesion: 0.5
-Nodes (1): add food nutrition scoring fields  Revision ID: 0002_food_score Revises: 0001_in
+Nodes (1): initial schema  Revision ID: 0001_initial_schema Revises: Create Date: 2026-04-1
 
 ### Community 25 - "Community 25"
 Cohesion: 0.5
-Nodes (1): set food external source default to usda  Revision ID: 0003_food_source Revises:
+Nodes (1): add food nutrition scoring fields  Revision ID: 0002_food_score Revises: 0001_in
 
 ### Community 26 - "Community 26"
 Cohesion: 0.5
-Nodes (1): food log enhancements and week 5 tracking fields  Revision ID: 0005_food_log_enh
+Nodes (1): set food external source default to usda  Revision ID: 0003_food_source Revises:
 
 ### Community 27 - "Community 27"
 Cohesion: 0.5
-Nodes (1): missing ingredients and week 6 fixes  Revision ID: 0006_missing_ingredients Revi
+Nodes (1): food log enhancements and week 5 tracking fields  Revision ID: 0005_food_log_enh
 
 ### Community 28 - "Community 28"
 Cohesion: 0.5
-Nodes (1): add user role  Revision ID: 0007_add_user_role Revises: 0006_missing_ingredients
+Nodes (1): missing ingredients and week 6 fixes  Revision ID: 0006_missing_ingredients Revi
 
 ### Community 29 - "Community 29"
+Cohesion: 0.5
+Nodes (1): add user role  Revision ID: 0007_add_user_role Revises: 0006_missing_ingredients
+
+### Community 30 - "Community 30"
 Cohesion: 0.67
 Nodes (3): BaseSettings, get_settings(), Settings
 
-### Community 30 - "Community 30"
-Cohesion: 0.5
-Nodes (0): 
-
 ### Community 31 - "Community 31"
 Cohesion: 0.5
-Nodes (2): CustomMealPage(), useCustomMealBuilder()
+Nodes (0): 
 
 ### Community 32 - "Community 32"
 Cohesion: 0.67
@@ -453,16 +453,16 @@ Nodes (0):
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Select()` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 7`, `Community 8`, `Community 9`, `Community 11`, `Community 14`, `Community 20`?**
-  _High betweenness centrality (0.131) - this node is a cross-community bridge._
-- **Why does `main()` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 7`, `Community 9`?**
+- **Why does `Select()` connect `Community 8` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`, `Community 7`, `Community 9`, `Community 11`, `Community 14`?**
+  _High betweenness centrality (0.132) - this node is a cross-community bridge._
+- **Why does `main()` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`, `Community 8`, `Community 9`?**
   _High betweenness centrality (0.053) - this node is a cross-community bridge._
-- **Why does `get_next_meal_recommendation()` connect `Community 5` to `Community 0`, `Community 2`, `Community 3`, `Community 4`, `Community 13`?**
+- **Why does `get_next_meal_recommendation()` connect `Community 8` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`, `Community 13`?**
   _High betweenness centrality (0.047) - this node is a cross-community bridge._
-- **Are the 45 inferred relationships involving `Select()` (e.g. with `require_current_user()` and `_load_user()`) actually correct?**
-  _`Select()` has 45 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 31 inferred relationships involving `str` (e.g. with `require_current_user_id()` and `create_access_token()`) actually correct?**
-  _`str` has 31 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 46 inferred relationships involving `Select()` (e.g. with `require_current_user()` and `_load_user()`) actually correct?**
+  _`Select()` has 46 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 33 inferred relationships involving `str` (e.g. with `require_current_user_id()` and `create_access_token()`) actually correct?**
+  _`str` has 33 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 11 inferred relationships involving `get_next_meal_recommendation()` (e.g. with `get_next_recommendation()` and `get_user_medications()`) actually correct?**
   _`get_next_meal_recommendation()` has 11 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 22 inferred relationships involving `main()` (e.g. with `User` and `UserPreferences`) actually correct?**

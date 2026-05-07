@@ -21,6 +21,7 @@ async def get_meals(
     tags: list[str] | None = None,
     limit: int = 20,
     offset: int = 0,
+    q: str | None = None,
 ) -> tuple[list[Meal], int]:
     statement = _apply_meal_filters(
         select(Meal).where(Meal.is_curated.is_(True)),
@@ -30,12 +31,14 @@ async def get_meals(
         min_score=min_score,
         max_calories=max_calories,
         tags=tags,
+        q=q,
     )
+    order_by = (Meal.name,) if q else (Meal.anti_inflammatory_score.desc(), Meal.name)
     count_statement = select(func.count()).select_from(statement.subquery())
     total = int(await db.scalar(count_statement) or 0)
     result = await db.scalars(
         statement.options(selectinload(Meal.ingredients).selectinload(MealIngredient.food))
-        .order_by(Meal.anti_inflammatory_score.desc(), Meal.name)
+        .order_by(*order_by)
         .limit(limit)
         .offset(offset)
     )
@@ -85,6 +88,7 @@ def _apply_meal_filters(
     min_score: float | None,
     max_calories: int | None,
     tags: list[str] | None,
+    q: str | None = None,
 ) -> Select[tuple[Meal]]:
     if meal_type:
         statement = statement.where(Meal.meal_type == meal_type)
@@ -98,4 +102,6 @@ def _apply_meal_filters(
         statement = statement.where(Meal.total_calories <= max_calories)
     for tag in tags or []:
         statement = statement.where(Meal.tags.contains([tag]))
+    if q:
+        statement = statement.where(Meal.name.ilike(f"%{q}%"))
     return statement

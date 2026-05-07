@@ -13,6 +13,7 @@ from app.models.meal import Meal
 from app.schemas.custom_meal import CustomMealIngredientInput
 from app.schemas.ingredient import MissingIngredientCreate
 from app.schemas.user import ChangePasswordRequest, RegisterRequest
+from app.services import rule_engine
 from app.services.custom_meal_service import _build_tags, _easy_foods, _is_vegetarian
 from app.services.rule_engine import RecommendationResult, _final_rank, result_context
 from app.services.nutrition_tracker import DailyNutritionState, NutritionGaps
@@ -89,17 +90,25 @@ def test_missing_ingredient_create_accepts_submitted_values() -> None:
     assert data.submitted_calories == Decimal("43")
 
 
-def test_normal_rank_orders_by_score() -> None:
+def test_normal_rank_shuffles_full_list(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(rule_engine.random, "shuffle", lambda items: items.reverse())
     ranked = _final_rank([_meal("b", "4.0", False), _meal("a", "8.0", False)], "normal")
     assert [meal.name for meal in ranked] == ["a", "b"]
 
 
-def test_flare_only_rank_places_flare_meals_first() -> None:
-    ranked = _final_rank([_meal("normal", "9.0", False), _meal("flare", "6.0", True)], "flare_only")
-    assert ranked[0].is_flare_friendly is True
+def test_flare_only_rank_places_flare_meals_first_then_shuffles_within_group(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(rule_engine.random, "shuffle", lambda items: items.reverse())
+    ranked = _final_rank(
+        [_meal("normal", "9.0", False), _meal("flare", "6.0", True), _meal("flare 2", "2.0", True)],
+        "flare_only",
+    )
+    assert [meal.name for meal in ranked] == ["flare 2", "flare", "normal"]
 
 
-def test_mixed_rank_places_two_flare_first_then_normal() -> None:
+def test_mixed_rank_places_all_flare_first_then_shuffles_each_group(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(rule_engine.random, "shuffle", lambda items: items.reverse())
     meals = [
         _meal("normal 1", "9.0", False),
         _meal("normal 2", "8.0", False),
@@ -108,13 +117,14 @@ def test_mixed_rank_places_two_flare_first_then_normal() -> None:
         _meal("flare 3", "5.0", True),
     ]
     ranked = _final_rank(meals, "mixed")
-    assert [meal.is_flare_friendly for meal in ranked[:3]] == [True, True, False]
+    assert [meal.name for meal in ranked] == ["flare 3", "flare 2", "flare 1", "normal 2", "normal 1"]
 
 
-def test_mixed_rank_keeps_extra_flare_after_top_five_pattern() -> None:
+def test_mixed_rank_keeps_all_flare_before_non_flare(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(rule_engine.random, "shuffle", lambda items: items.reverse())
     meals = [_meal(f"flare {i}", str(9 - i), True) for i in range(3)] + [_meal("normal", "8", False)]
     ranked = _final_rank(meals, "mixed")
-    assert ranked[3].is_flare_friendly is True
+    assert [meal.is_flare_friendly for meal in ranked] == [True, True, True, False]
 
 
 def test_result_context_includes_recommendation_mode() -> None:
