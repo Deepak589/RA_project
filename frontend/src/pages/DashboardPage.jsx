@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout.jsx";
 import MealCard from "../components/meals/MealCard.jsx";
@@ -11,13 +12,42 @@ import { createFoodLog } from "../api/logs";
 import { submitRecommendationFeedback } from "../api/recommendations";
 import { useAuth } from "../hooks/useAuth.js";
 import { useTodayDashboard } from "../hooks/useDashboard.js";
+import { useProfile } from "../hooks/useProfile.js";
 import { formatDate, greeting } from "../utils/formatters.js";
+
+const DIET_OVERRIDE_KEY = "diet_override";
+
+function readStoredOverride() {
+  if (typeof window === "undefined") return null;
+  const value = window.localStorage.getItem(DIET_OVERRIDE_KEY);
+  return value === "vegetarian" || value === "non_vegetarian" ? value : null;
+}
+
+function hasRealDietPreference(flags) {
+  if (!Array.isArray(flags) || flags.length === 0) return false;
+  if (flags.length === 1 && flags[0] === "no_preference") return false;
+  return flags.some((flag) => flag && flag !== "no_preference");
+}
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { data, isLoading, isError, refetch } = useTodayDashboard();
+  const { profile } = useProfile();
+  const dietaryFlags = profile.data?.preferences?.dietary_flags_jsonb || profile.data?.preferences?.dietary_flags || [];
+  const showDietToggle = !hasRealDietPreference(dietaryFlags);
+  const [dietOverride, setDietOverride] = useState(readStoredOverride);
+  const activeOverride = showDietToggle ? dietOverride : null;
+  const { data, isLoading, isError, refetch } = useTodayDashboard(activeOverride);
   const recommendation = data?.recommendation?.recommended_meal || data?.next_recommendation?.recommended_meal || data?.next_recommendation?.primary || data?.primary_recommendation;
   const recommendationId = data?.recommendation?.recommendation_log_id || data?.next_recommendation?.recommendation_log_id || data?.recommendation_log_id;
+
+  function chooseDiet(value) {
+    const next = dietOverride === value ? null : value;
+    setDietOverride(next);
+    if (typeof window !== "undefined") {
+      if (next) window.localStorage.setItem(DIET_OVERRIDE_KEY, next);
+      else window.localStorage.removeItem(DIET_OVERRIDE_KEY);
+    }
+  }
 
   async function acceptMeal(meal) {
     if (recommendationId) await submitRecommendationFeedback(recommendationId, { feedback: "accepted" });
@@ -39,6 +69,25 @@ export default function DashboardPage() {
       <EscalationBanner message={data?.escalation_message} />
       <FlareBanner mode={data?.recommendation_mode || (data?.flare_active ? "flare_only" : "")} />
       <NutritionSummary nutrition={data?.nutrition_summary || data?.nutrition} />
+      {showDietToggle && (
+        <Card>
+          <p className="mb-2 font-medium text-gray-700">Filter recommendations</p>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant={dietOverride === "vegetarian" ? "primary" : "secondary"}
+              onClick={() => chooseDiet("vegetarian")}
+            >
+              Veg
+            </Button>
+            <Button
+              variant={dietOverride === "non_vegetarian" ? "primary" : "secondary"}
+              onClick={() => chooseDiet("non_vegetarian")}
+            >
+              Non-Veg
+            </Button>
+          </div>
+        </Card>
+      )}
       <MealCard meal={recommendation} explanation={data?.recommendation?.explanation || data?.next_recommendation?.explanation} onAccept={acceptMeal} onSkip={refetch} />
       <div className="grid gap-2">
         <Link to="/meals/log"><Button className="w-full" variant="secondary">+ Log a meal</Button></Link>
