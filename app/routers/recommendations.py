@@ -24,10 +24,11 @@ router = APIRouter(prefix="/api/v1/recommendations", tags=["recommendations"])
 async def get_next_recommendation_endpoint(
     meal_type: Annotated[str, Query(pattern="^(breakfast|lunch|dinner|snack)$")],
     flare_active: bool = Query(default=False),
+    diet_override: Annotated[str | None, Query(pattern="^(vegetarian|non_vegetarian)$")] = None,
     db: AsyncSession = Depends(get_db_session),
     user_id: str = Depends(require_current_user_id),
 ) -> RecommendationResponse:
-    result = await get_next_recommendation(db, UUID(user_id), meal_type, flare_active)
+    result = await get_next_recommendation(db, UUID(user_id), meal_type, flare_active, diet_override=diet_override)
     return RecommendationResponse(
         recommended_meal=result.primary_recommendation,
         primary=result.primary_recommendation,

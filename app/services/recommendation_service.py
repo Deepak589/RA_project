@@ -17,8 +17,16 @@ async def get_next_recommendation(
     user_id: UUID,
     meal_type: str,
     flare_active: bool = False,
+    diet_override: str | None = None,
 ) -> RecommendationResult:
-    return await get_next_meal_recommendation(db, user_id=user_id, meal_type=meal_type, flare_active=flare_active, limit=5)
+    return await get_next_meal_recommendation(
+        db,
+        user_id=user_id,
+        meal_type=meal_type,
+        flare_active=flare_active,
+        limit=5,
+        diet_override=diet_override,
+    )
 
 
 async def submit_feedback(

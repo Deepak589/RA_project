@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import random
 from dataclasses import asdict, dataclass
 from datetime import datetime, time, timedelta, timezone
@@ -11,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.enums import RecommendationFeedbackStatus
+from app.models.food import MealItem
 from app.models.log import LifestyleLog, SymptomLog
 from app.models.meal import Meal, MealIngredient
 from app.models.recommendation import RecommendationLog
@@ -38,7 +40,7 @@ class RecommendationResult:
     gaps: NutritionGaps
     recommendation_log_id: UUID | None = None
 
-VARIETY_LOOKBACK_COUNT = 4
+VARIETY_LOOKBACK_COUNT = 8
 MIN_ALTERNATIVES = 3
 MIN_ELIGIBLE_POOL_SIZE = 3
 RECENT_DIVERSITY_LOOKBACK_COUNT = 3
@@ -49,12 +51,16 @@ VARIETY_PENALTY_TIERS = [
 ]
 
 
+VALID_DIET_OVERRIDES = {"vegetarian", "non_vegetarian"}
+
+
 async def get_next_meal_recommendation(
     db: AsyncSession,
     user_id: UUID,
     meal_type: str,
     flare_active: bool = False,
     limit: int = 5,
+    diet_override: str | None = None,
 ) -> RecommendationResult:
     candidates = await _load_candidate_meals(db, meal_type)
     if not candidates:
@@ -130,14 +136,20 @@ async def get_next_meal_recommendation(
     if _apply_nutrition_boosts(candidates, gaps):
         dominant_rule = "nutrition" if dominant_rule == "score" else dominant_rule
 
-    if _apply_preferences(candidates, preferences):
+    effective_override = diet_override if diet_override in VALID_DIET_OVERRIDES else None
+    if _apply_preferences(candidates, preferences, effective_override):
         dominant_rule = "preference" if dominant_rule == "score" else dominant_rule
+    if effective_override:
+        logs.append(f"[PREFERENCE OVERRIDE: diet_override={effective_override}]")
 
     recent_logs = await _load_recent_recommendation_logs(db, user_id, meal_type, VARIETY_LOOKBACK_COUNT)
     variety_result = _apply_variety_penalty(candidates, recent_logs)
     if variety_result == "variety_pool_reset":
         dominant_rule = "variety_pool_reset"
         logs.append("[VARIETY: candidate pool below 3 after recent-window penalty; reset variety scoring for this meal type]")
+    elif variety_result == "variety_pool_reset_partial":
+        dominant_rule = "variety_pool_reset"
+        logs.append("[VARIETY: partial reset — repeat offenders penalized]")
     elif variety_result == "variety":
         dominant_rule = "variety" if dominant_rule == "score" else dominant_rule
 
@@ -224,7 +236,10 @@ async def _load_candidate_meals(db: AsyncSession, meal_type: str) -> list[Meal]:
     result = await db.scalars(
         select(Meal)
         .where(Meal.is_curated.is_(True), Meal.meal_type == meal_type)
-        .options(selectinload(Meal.ingredients).selectinload(MealIngredient.food))
+        .options(
+            selectinload(Meal.ingredients).selectinload(MealIngredient.food),
+            selectinload(Meal.meal_items).selectinload(MealItem.food),
+        )
     )
     return list(result)
 
@@ -282,15 +297,30 @@ def _apply_nutrition_boosts(meals: list[Meal], gaps: NutritionGaps) -> bool:
     return applied
 
 
-def _apply_preferences(meals: list[Meal], preferences: UserPreferences | None) -> bool:
+def _apply_preferences(
+    meals: list[Meal],
+    preferences: UserPreferences | None,
+    diet_override: str | None = None,
+) -> bool:
     flags = [flag.lower() for flag in (getattr(preferences, "dietary_flags_jsonb", None) or [])]
     goals = [flag.lower() for flag in (getattr(preferences, "goal_flags_jsonb", None) or [])]
     changed = False
     active_dietary_flags = [flag for flag in flags if flag not in {"no_preference"}]
-    has_real_preference = bool(active_dietary_flags) and "no_preference" not in flags
+    has_real_preference = bool(active_dietary_flags)
+    if diet_override in VALID_DIET_OVERRIDES and not has_real_preference:
+        active_dietary_flags = [diet_override]
+        has_real_preference = True
     if has_real_preference:
         original_count = len(meals)
-        meals[:] = [meal for meal in meals if _meal_matches_dietary_flags(meal, active_dietary_flags)]
+        filtered = [meal for meal in meals if _meal_matches_dietary_flags(meal, active_dietary_flags)]
+        override_drove_filter = diet_override in VALID_DIET_OVERRIDES and not [f for f in flags if f != "no_preference"]
+        if not filtered and override_drove_filter:
+            logging.getLogger(__name__).warning(
+                "[PREFERENCE OVERRIDE: no %s meals for this meal type — fallback to full pool]",
+                diet_override,
+            )
+        else:
+            meals[:] = filtered
         changed = len(meals) != original_count
     for meal in meals:
         if meal.cuisine_type and meal.cuisine_type.lower() in flags:
@@ -332,9 +362,13 @@ def _apply_variety_penalty(meals: list[Meal], recent_logs: list[RecommendationLo
 
     eligible_pool = [meal for meal in meals if str(meal.id) not in recent_ids]
     if len(eligible_pool) < MIN_ELIGIBLE_POOL_SIZE:
+        repeat_offenders = {mid for mid in recent_ids if recent_ids.count(mid) >= 2}
         for meal in meals:
-            setattr(meal, "adjusted_score", base_scores[str(meal.id)])
-        return "variety_pool_reset"
+            mid = str(meal.id)
+            if mid in repeat_offenders:
+                continue
+            setattr(meal, "adjusted_score", base_scores[mid])
+        return "variety_pool_reset_partial"
 
     return "variety"
 
@@ -461,7 +495,7 @@ def _score(meal: Meal) -> float:
 def _priority_delta(meal: Meal) -> float:
     if not hasattr(meal, "adjusted_score"):
         return 0.0
-    return round(float(getattr(meal, "adjusted_score", 0.0)) - float(meal.anti_inflammatory_score or 0), 6)
+    return round(float(getattr(meal, "adjusted_score", 0.0)) - float(meal.anti_inflammatory_score or 0), 1)
 
 
 def _bump(meal: Meal, delta: float) -> None:
@@ -493,6 +527,10 @@ def _meal_matches_dietary_flags(meal: Meal, flags: list[str]) -> bool:
         "low_sodium": {"low_sodium"},
     }
     for flag in flags:
+        if flag == "non_vegetarian":
+            if meal.is_vegetarian or tags.intersection({"vegetarian", "vegan"}):
+                return False
+            continue
         if flag in flag_requirements and not tags.intersection(flag_requirements[flag]):
             return False
     return True

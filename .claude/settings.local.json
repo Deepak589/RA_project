@@ -19,7 +19,11 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(jq *)",
-      "Bash(graphify *)"
+      "Bash(graphify *)",
+      "Bash(python -m pytest tests/services/test_recommendation_loop.py -v --no-header)",
+      "Bash(docker exec ra_project-db-1 *)",
+      "Bash(docker exec ra_project-api-1 *)",
+      "Bash(python -m pytest tests/services/test_jwt_issuer.py tests/services/test_anti_inflammatory_scorer.py tests/services/test_food_normalizer.py tests/services/test_nutrition_tracker.py tests/services/test_variety_penalty.py -v -q)"
     ],
     "deny": [
       "Bash(rm -rf *)",

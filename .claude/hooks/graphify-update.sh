@@ -8,11 +8,19 @@ if git diff --quiet 2>/dev/null && git diff --cached --quiet 2>/dev/null; then
   exit 0
 fi
 
-# Refresh graph in background, non-blocking
-# with:
-GRAPHIFY="$(pwd)/node_modules/.bin/graphify"
-if [ -x "$GRAPHIFY" ]; then
-  ("$GRAPHIFY" update . >/dev/null 2>&1 &) || true
+# Refresh graph synchronously so it finishes before Claude session exits
+GRAPHIFY=""
+for candidate in \
+  "$(pwd)/venv/Scripts/graphify.exe" \
+  "$(pwd)/venv/bin/graphify" \
+  "$(pwd)/node_modules/.bin/graphify"; do
+  if [ -x "$candidate" ]; then
+    GRAPHIFY="$candidate"
+    break
+  fi
+done
+if [ -n "$GRAPHIFY" ]; then
+  "$GRAPHIFY" update . >/dev/null 2>&1 || true
 fi
 
 # Nudge — your terminal only, not Claude's context

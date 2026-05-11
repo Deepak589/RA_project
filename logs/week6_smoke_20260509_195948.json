@@ -1,0 +1,32 @@
+{
+  "steps": [
+    "registered user with preferences",
+    "set preferences and medication"
+  ],
+  "user_id": "f40acf31-a179-40fb-a60a-7d7c1a636793",
+  "spinach_found": true,
+  "missing_statuses": {
+    "dragonfruit": "missing_completely",
+    "papaya": "user_entered"
+  },
+  "custom_meal": {
+    "preview_calories": 291.68,
+    "saved_id": "07e6f540-ae64-4f5e-a92a-91c4f1c470c0",
+    "score": 5.9
+  },
+  "flare_only": {
+    "mode": "flare_only",
+    "all_flare_friendly": true
+  },
+  "mixed": {
+    "mode": "mixed",
+    "first_two_flare": [
+      true,
+      true
+    ]
+  },
+  "normal": {
+    "mode": "normal"
+  },
+  "weekly_dashboard_present": true
+}

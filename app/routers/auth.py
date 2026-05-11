@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -24,12 +27,14 @@ from app.schemas.user import (
 )
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
+logger = logging.getLogger(__name__)
+limiter = Limiter(key_func=get_remote_address)
 
 COOKIE_NAME = "ra_refresh"
 COOKIE_OPTIONS = dict(
     httponly=True,
-    secure=False,
-    samesite="lax",
+    secure=settings.cookie_secure,
+    samesite="strict" if settings.cookie_secure else "lax",
     max_age=60 * 60 * 24 * 30,
     path="/",
 )
@@ -64,7 +69,9 @@ async def _issue_tokens(db: AsyncSession, user: User, old_session: Authenticatio
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("3/minute")
 async def register(
+    request: Request,
     data: RegisterRequest,
     response: Response,
     db: AsyncSession = Depends(get_db_session),
@@ -96,13 +103,16 @@ async def register(
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit("5/minute")
 async def login(
+    request: Request,
     data: LoginRequest,
     response: Response,
     db: AsyncSession = Depends(get_db_session),
 ) -> TokenResponse:
     user = await db.scalar(select(User).where(User.email.ilike(data.email)))
     if user is None or not verify_password(data.password, user.password_hash):
+        logger.warning("auth.login_failed email=%s", data.email)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
     user.last_login_at = datetime.now(timezone.utc).replace(tzinfo=None)
     tokens = await _issue_tokens(db, user)
@@ -111,6 +121,7 @@ async def login(
 
 
 @router.post("/refresh", response_model=TokenResponse)
+@limiter.limit("10/minute")
 async def refresh(
     request: Request,
     response: Response,
@@ -186,7 +197,9 @@ async def update_me(
 
 
 @router.post("/change-password")
+@limiter.limit("5/minute")
 async def change_password(
+    request: Request,
     data: ChangePasswordRequest,
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(require_current_user),
@@ -199,4 +212,5 @@ async def change_password(
     for session in result:
         session.revoked_at = now
     await db.commit()
+    logger.info("auth.password_changed user_id=%s", current_user.id)
     return {"status": "password_changed"}

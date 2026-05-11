@@ -28,6 +28,7 @@ def _build_token(subject: str, expires_delta: timedelta, token_type: str, extra_
         "type": token_type,
         "iat": now,
         "exp": now + expires_delta,
+        "iss": settings.jwt_issuer,
     }
     if extra_claims:
         payload.update(extra_claims)
@@ -60,7 +61,7 @@ def create_refresh_token(subject: str, extra_claims: dict[str, Any] | None = Non
 
 def decode_token(token: str) -> dict[str, Any]:
     try:
-        return jwt.decode(token, settings.secret_key, algorithms=[settings.jwt_algorithm])
+        return jwt.decode(token, settings.secret_key, algorithms=[settings.jwt_algorithm], issuer=settings.jwt_issuer)
     except JWTError as exc:
         raise ValueError("Invalid token") from exc
 

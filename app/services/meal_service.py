@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 import app.db.base  # noqa: F401  # Ensure all relationship targets are registered.
+from app.models.food import MealItem
 from app.models.meal import Meal, MealIngredient
 
 
@@ -37,7 +38,10 @@ async def get_meals(
     count_statement = select(func.count()).select_from(statement.subquery())
     total = int(await db.scalar(count_statement) or 0)
     result = await db.scalars(
-        statement.options(selectinload(Meal.ingredients).selectinload(MealIngredient.food))
+        statement.options(
+            selectinload(Meal.ingredients).selectinload(MealIngredient.food),
+            selectinload(Meal.meal_items).selectinload(MealItem.food),
+        )
         .order_by(*order_by)
         .limit(limit)
         .offset(offset)
@@ -49,7 +53,10 @@ async def get_meal_by_id(db: AsyncSession, meal_id: UUID) -> Meal:
     meal = await db.scalar(
         select(Meal)
         .where(Meal.id == meal_id, Meal.is_curated.is_(True))
-        .options(selectinload(Meal.ingredients).selectinload(MealIngredient.food))
+        .options(
+            selectinload(Meal.ingredients).selectinload(MealIngredient.food),
+            selectinload(Meal.meal_items).selectinload(MealItem.food),
+        )
     )
     if meal is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Meal not found")
@@ -60,7 +67,10 @@ async def get_flare_safe_meals(db: AsyncSession, limit: int = 10) -> list[Meal]:
     result = await db.scalars(
         select(Meal)
         .where(Meal.is_curated.is_(True), Meal.is_flare_friendly.is_(True))
-        .options(selectinload(Meal.ingredients).selectinload(MealIngredient.food))
+        .options(
+            selectinload(Meal.ingredients).selectinload(MealIngredient.food),
+            selectinload(Meal.meal_items).selectinload(MealItem.food),
+        )
         .order_by(Meal.anti_inflammatory_score.desc(), Meal.name)
         .limit(limit)
     )
@@ -72,7 +82,10 @@ async def get_meals_by_tag(db: AsyncSession, tag: str, limit: int = 20, offset: 
     count_statement = select(func.count()).select_from(statement.subquery())
     total = int(await db.scalar(count_statement) or 0)
     result = await db.scalars(
-        statement.options(selectinload(Meal.ingredients).selectinload(MealIngredient.food))
+        statement.options(
+            selectinload(Meal.ingredients).selectinload(MealIngredient.food),
+            selectinload(Meal.meal_items).selectinload(MealItem.food),
+        )
         .order_by(Meal.anti_inflammatory_score.desc(), Meal.name)
         .limit(limit)
         .offset(offset)

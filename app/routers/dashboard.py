@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from datetime import date
 
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
@@ -46,10 +48,11 @@ class WeeklyDashboardResponse(BaseModel):
 
 @router.get("/today", response_model=TodayDashboardResponse)
 async def get_today_dashboard_endpoint(
+    diet_override: Annotated[str | None, Query(pattern="^(vegetarian|non_vegetarian)$")] = None,
     db: AsyncSession = Depends(get_db_session),
     user_id: str = Depends(require_current_user_id),
 ) -> TodayDashboardResponse:
-    dashboard = await get_today_dashboard(db, UUID(user_id))
+    dashboard = await get_today_dashboard(db, UUID(user_id), diet_override=diet_override)
     gaps = get_nutrition_gaps(dashboard.nutrition)
     rec = dashboard.next_recommendation
     return TodayDashboardResponse(

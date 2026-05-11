@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta, timezone
 from uuid import UUID
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.enums import FlareLevel, RecommendationFeedbackStatus
 from app.models.log import FoodLog, LifestyleLog, SymptomLog
 from app.models.recommendation import RecommendationLog
+from app.models.user import User
 from app.services.log_service import ESCALATION_MESSAGE, get_todays_lifestyle_log, get_todays_symptom_log
 from app.services.nutrition_tracker import DailyNutritionState, get_nutrition_gaps, get_todays_nutrition
 from app.services.recommendation_service import get_next_recommendation
@@ -45,17 +47,23 @@ class WeeklyDashboard:
     insights: list[str]
 
 
-async def get_today_dashboard(db: AsyncSession, user_id: UUID) -> TodayDashboard:
+async def get_today_dashboard(
+    db: AsyncSession,
+    user_id: UUID,
+    diet_override: str | None = None,
+) -> TodayDashboard:
     symptom = await get_todays_symptom_log(db, user_id)
     lifestyle = await get_todays_lifestyle_log(db, user_id)
     nutrition = await get_todays_nutrition(db, user_id)
+    user_tz = await db.scalar(select(User.timezone).where(User.id == user_id))
     flare_active = symptom is not None and symptom.flare_level in {FlareLevel.MODERATE, FlareLevel.SEVERE}
     escalation_active = symptom is not None and (symptom.pain_score >= 8 or symptom.flare_level == FlareLevel.SEVERE)
     recommendation = await get_next_recommendation(
         db,
         user_id=user_id,
-        meal_type=detect_meal_type_by_time(),
+        meal_type=detect_meal_type_by_time(user_tz=user_tz),
         flare_active=flare_active,
+        diet_override=diet_override,
     )
     return TodayDashboard(
         date=datetime.now(timezone.utc).date(),
@@ -118,8 +126,14 @@ async def get_weekly_dashboard(db: AsyncSession, user_id: UUID) -> WeeklyDashboa
     )
 
 
-def detect_meal_type_by_time(moment: datetime | None = None) -> str:
-    hour = (moment or datetime.now(timezone.utc)).hour
+def detect_meal_type_by_time(moment: datetime | None = None, user_tz: str | None = None) -> str:
+    base = moment or datetime.now(timezone.utc)
+    if user_tz:
+        try:
+            base = base.astimezone(ZoneInfo(user_tz))
+        except ZoneInfoNotFoundError:
+            pass
+    hour = base.hour
     if hour < 10:
         return "breakfast"
     if hour < 14:

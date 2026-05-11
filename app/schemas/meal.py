@@ -67,6 +67,36 @@ class MealResponse(MealBase):
     ingredients: list[MealIngredientResponse] = Field(default_factory=list)
     created_at: datetime
 
+    @model_validator(mode="before")
+    @classmethod
+    def _fallback_ingredients_from_meal_items(cls, value: Any) -> Any:
+        if isinstance(value, dict):
+            return value
+        try:
+            ingredients = list(value.ingredients or [])
+        except Exception:
+            return value
+        if ingredients:
+            return value
+        try:
+            meal_items = list(value.meal_items or [])
+        except Exception:
+            return value
+        if not meal_items:
+            return value
+        data = {k: getattr(value, k, None) for k in cls.model_fields if k != "ingredients"}
+        data["ingredients"] = [
+            {
+                "food_id": item.food_id,
+                "food_name": item.food.name if getattr(item, "food", None) else "",
+                "portion_g": item.grams,
+                "cooking_state": item.food.cooking_state if getattr(item, "food", None) else "unspecified",
+                "display_note": None,
+            }
+            for item in meal_items
+        ]
+        return data
+
 
 class MealSearchResponse(BaseModel):
     items: list[MealResponse]

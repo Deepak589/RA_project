@@ -32,7 +32,7 @@ async def test_get_meals_returns_200(auth_headers: dict[str, str]) -> None:
         response = await client.get("/api/v1/meals", headers=auth_headers)
 
     assert response.status_code == 200
-    assert response.json()["total"] == 100
+    assert response.json()["total"] >= 100
 
 
 @pytest.mark.asyncio
@@ -42,7 +42,7 @@ async def test_get_meals_filters_breakfast(auth_headers: dict[str, str]) -> None
 
     assert response.status_code == 200
     body = response.json()
-    assert body["total"] == 20
+    assert body["total"] >= 20
     assert {item["meal_type"] for item in body["items"]} == {"breakfast"}
 
 

@@ -99,7 +99,7 @@ class AccountDeletionRequestResponse(AccountDeletionRequestBase):
 
 class UserBase(BaseModel):
     email: EmailStr
-    full_name: str
+    full_name: str = Field(max_length=200)
     timezone: str = "UTC"
     role: str = "user"
     is_active: bool = True
@@ -113,14 +113,14 @@ class UserCreate(UserBase):
 
 class RegisterRequest(BaseModel):
     email: EmailStr
-    password: str = Field(min_length=8)
-    name: str = Field(min_length=1)
+    password: str = Field(min_length=8, max_length=72)
+    name: str = Field(min_length=1, max_length=200)
     timezone: str = "UTC"
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(max_length=72)
 
 
 class RefreshRequest(BaseModel):
@@ -141,8 +141,8 @@ class UserUpdateRequest(BaseModel):
 
 
 class ChangePasswordRequest(BaseModel):
-    current_password: str
-    new_password: str = Field(min_length=8)
+    current_password: str = Field(max_length=72)
+    new_password: str = Field(min_length=8, max_length=72)
 
 
 class UserResponse(UserBase):

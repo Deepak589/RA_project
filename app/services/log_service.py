@@ -51,7 +51,13 @@ async def create_food_log(db: AsyncSession, user_id: UUID, data: FoodLogCreate) 
             }
         )
     elif log_source == "custom_meal":
-        custom_meal = await _get_or_404(db, CustomMeal, data.custom_meal_id, "Custom meal not found")
+        if data.custom_meal_id is None:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Custom meal not found")
+        custom_meal = await db.scalar(
+            select(CustomMeal).where(CustomMeal.id == data.custom_meal_id, CustomMeal.user_id == user_id)
+        )
+        if custom_meal is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Custom meal not found")
         values.update(
             {
                 "custom_meal_id": custom_meal.id,
