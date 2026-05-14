@@ -137,11 +137,12 @@ def upgrade() -> None:
                schema='static')
 
     # --- Constraint renames ---
-    op.drop_constraint('user_preferences_user_id_key', 'user_preferences', schema='core', type_='unique')
-    op.drop_index('ix_core_user_preferences_user_id', table_name='user_preferences', schema='core')
+    op.execute("ALTER TABLE core.user_preferences DROP CONSTRAINT IF EXISTS user_preferences_user_id_key")
+    op.execute("DROP INDEX IF EXISTS core.ix_core_user_preferences_user_id")
     op.create_index('ix_core_user_preferences_user_id', 'user_preferences', ['user_id'], unique=True, schema='core')
 
-    op.drop_constraint('lifestyle_logs_user_id_log_date_key', 'lifestyle_logs', schema='tracking', type_='unique')
+    op.execute("ALTER TABLE tracking.lifestyle_logs DROP CONSTRAINT IF EXISTS lifestyle_logs_user_id_log_date_key")
+    op.execute("ALTER TABLE tracking.lifestyle_logs DROP CONSTRAINT IF EXISTS uq_tracking_lifestyle_logs_user_log_date")
     op.create_unique_constraint('uq_tracking_lifestyle_logs_user_log_date', 'lifestyle_logs', ['user_id', 'log_date'], schema='tracking')
 
 
