@@ -29,7 +29,12 @@
       "Bash(python -m json.tool --no-ensure-ascii)",
       "Bash(curl -s 'http://localhost:8000/api/v1/dashboard/today?meal_type=lunch&diet_override=vegetarian' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OTdmMDE1Ni0wZDQxLTQxNDMtYTZjNC0xNmFjOWIzNzdiMGIiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzc4NzczODY2LCJleHAiOjE3Nzg3NzU2NjYsImlzcyI6InJhLWFwcCIsImp0aSI6ImEyYWI5NGRhLWMxZTktNDc4YS05YTc4LTgyYTI1YmVhOTNkYyJ9.DGpjGqUf9vvMkmevQdb7VgWrnEzZW98lFOFdXkVFYso')",
       "Bash(python -c ' *)",
-      "Bash(docker compose *)"
+      "Bash(docker compose *)",
+      "Bash(curl -s -H \"Authorization: Bearer rnd_UVb8HobZqQNeVGDuEE69AlgnNHOM\" \"https://api.render.com/v1/logs?resource.id=srv-d833623eo5us73dvogb0&limit=50\")",
+      "Bash(python -m json.tool)",
+      "Bash(curl -s -H \"Authorization: Bearer rnd_UVb8HobZqQNeVGDuEE69AlgnNHOM\" \"https://api.render.com/v1/services/srv-d833623eo5us73dvogb0/events?limit=10\")",
+      "Bash(curl -s -H \"Authorization: Bearer rnd_UVb8HobZqQNeVGDuEE69AlgnNHOM\" \"https://api.render.com/v1/services/srv-d833623eo5us73dvogb0/deploys/dep-d833mjd7vvec73ejjpd0\")",
+      "Bash(curl -s -H 'Authorization: Bearer rnd_UVb8HobZqQNeVGDuEE69AlgnNHOM' 'https://api.render.com/v1/logs?resource=srv-d833623eo5us73dvogb0&limit=100')"
     ],
     "deny": [
       "Bash(rm -rf *)",
