@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getTodayDashboard, getWeeklyDashboard } from "../api/dashboard";
 
-export function useTodayDashboard(dietOverride) {
+export function useTodayDashboard(dietOverride, mealType) {
   return useQuery({
-    queryKey: ["dashboard", "today", dietOverride || null],
-    queryFn: () => getTodayDashboard(dietOverride),
+    queryKey: ["dashboard", "today", dietOverride || null, mealType || null],
+    queryFn: () => getTodayDashboard(dietOverride, mealType),
     refetchInterval: 300_000,
   });
 }

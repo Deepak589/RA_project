@@ -35,8 +35,9 @@ export default function DashboardPage() {
   const dietaryFlags = profile.data?.preferences?.dietary_flags_jsonb || profile.data?.preferences?.dietary_flags || [];
   const showDietToggle = !hasRealDietPreference(dietaryFlags);
   const [dietOverride, setDietOverride] = useState(readStoredOverride);
+  const [mealType, setMealType] = useState(null);
   const activeOverride = showDietToggle ? dietOverride : null;
-  const { data, isLoading, isError, refetch } = useTodayDashboard(activeOverride);
+  const { data, isLoading, isError, refetch } = useTodayDashboard(activeOverride, mealType);
   const recommendation = data?.recommendation?.recommended_meal || data?.next_recommendation?.recommended_meal || data?.next_recommendation?.primary || data?.primary_recommendation;
   const recommendationId = data?.recommendation?.recommendation_log_id || data?.next_recommendation?.recommendation_log_id || data?.recommendation_log_id;
 
@@ -69,6 +70,21 @@ export default function DashboardPage() {
       <EscalationBanner message={data?.escalation_message} />
       <FlareBanner mode={data?.recommendation_mode || (data?.flare_active ? "flare_only" : "")} />
       <NutritionSummary nutrition={data?.nutrition_summary || data?.nutrition} />
+      <Card>
+        <p className="mb-2 font-medium text-gray-700">Meal type</p>
+        <div className="grid grid-cols-4 gap-2">
+          {["breakfast", "lunch", "snack", "dinner"].map((type) => (
+            <Button
+              key={type}
+              variant={mealType === type ? "primary" : "secondary"}
+              onClick={() => setMealType((prev) => (prev === type ? null : type))}
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </Button>
+          ))}
+        </div>
+        <p className="mt-2 text-xs text-gray-500">{mealType ? `Showing ${mealType} options` : "Auto-detecting by time of day"}</p>
+      </Card>
       {showDietToggle && (
         <Card>
           <p className="mb-2 font-medium text-gray-700">Filter recommendations</p>

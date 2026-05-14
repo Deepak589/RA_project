@@ -5,7 +5,8 @@ from datetime import date, datetime, time, timedelta, timezone
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from sqlalchemy import func, select
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.enums import FlareLevel, RecommendationFeedbackStatus
@@ -13,7 +14,7 @@ from app.models.log import FoodLog, LifestyleLog, SymptomLog
 from app.models.recommendation import RecommendationLog
 from app.models.user import User
 from app.services.log_service import ESCALATION_MESSAGE, get_todays_lifestyle_log, get_todays_symptom_log
-from app.services.nutrition_tracker import DailyNutritionState, get_nutrition_gaps, get_todays_nutrition
+from app.services.nutrition_tracker import DailyNutritionState, get_nutrition_gaps, get_todays_nutrition, summarize_food_logs
 from app.services.recommendation_service import get_next_recommendation
 from app.services.rule_engine import RecommendationResult
 
@@ -45,12 +46,14 @@ class WeeklyDashboard:
     best_day: date | None
     worst_day: date | None
     insights: list[str]
+    pain_trend: list[dict]
 
 
 async def get_today_dashboard(
     db: AsyncSession,
     user_id: UUID,
     diet_override: str | None = None,
+    meal_type: str | None = None,
 ) -> TodayDashboard:
     symptom = await get_todays_symptom_log(db, user_id)
     lifestyle = await get_todays_lifestyle_log(db, user_id)
@@ -61,7 +64,7 @@ async def get_today_dashboard(
     recommendation = await get_next_recommendation(
         db,
         user_id=user_id,
-        meal_type=detect_meal_type_by_time(user_tz=user_tz),
+        meal_type=meal_type if meal_type else detect_meal_type_by_time(user_tz=user_tz),
         flare_active=flare_active,
         diet_override=diet_override,
     )
@@ -77,9 +80,9 @@ async def get_today_dashboard(
     )
 
 
-async def get_weekly_dashboard(db: AsyncSession, user_id: UUID) -> WeeklyDashboard:
+async def get_weekly_dashboard(db: AsyncSession, user_id: UUID, week_offset: int = 0) -> WeeklyDashboard:
     today = datetime.now(timezone.utc).date()
-    week_start = today - timedelta(days=today.weekday())
+    week_start = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
     week_end = week_start + timedelta(days=6)
     start_dt = datetime.combine(week_start, time.min)
     end_dt = datetime.combine(week_end, time.max)
@@ -92,7 +95,14 @@ async def get_weekly_dashboard(db: AsyncSession, user_id: UUID) -> WeeklyDashboa
     lifestyles = list(await db.scalars(select(LifestyleLog).where(LifestyleLog.user_id == user_id, LifestyleLog.log_date.between(week_start, week_end))))
     food_logs = list(
         await db.scalars(
-            select(FoodLog).where(FoodLog.user_id == user_id, FoodLog.logged_at >= start_dt, FoodLog.logged_at <= end_dt)
+            select(FoodLog)
+            .where(FoodLog.user_id == user_id, FoodLog.logged_at >= start_dt, FoodLog.logged_at <= end_dt)
+            .options(
+                selectinload(FoodLog.food),
+                selectinload(FoodLog.meal),
+                selectinload(FoodLog.recommendation_meal),
+                selectinload(FoodLog.custom_meal),
+            )
         )
     )
     total_meals = len(food_logs)
@@ -108,7 +118,11 @@ async def get_weekly_dashboard(db: AsyncSession, user_id: UUID) -> WeeklyDashboa
     avg_pain = _avg([log.pain_score for log in symptoms])
     worst = max(symptoms, key=lambda log: log.pain_score, default=None)
     best = min(symptoms, key=lambda log: log.pain_score, default=None)
-    insights = await generate_weekly_insights(db, user_id)
+    pain_trend = [
+        {"date": log.logged_at.date().strftime("%a"), "pain_score": log.pain_score}
+        for log in sorted(symptoms, key=lambda s: s.logged_at)
+    ]
+    insights = generate_weekly_insights(food_logs, symptoms)
     return WeeklyDashboard(
         week_start=week_start,
         week_end=week_end,
@@ -123,6 +137,7 @@ async def get_weekly_dashboard(db: AsyncSession, user_id: UUID) -> WeeklyDashboa
         best_day=best.logged_at.date() if best else None,
         worst_day=worst.logged_at.date() if worst else None,
         insights=insights,
+        pain_trend=pain_trend,
     )
 
 
@@ -143,19 +158,27 @@ def detect_meal_type_by_time(moment: datetime | None = None, user_tz: str | None
     return "dinner"
 
 
-async def generate_weekly_insights(db: AsyncSession, user_id: UUID) -> list[str]:
-    dashboard_nutrition = await get_todays_nutrition(db, user_id)
-    gaps = get_nutrition_gaps(dashboard_nutrition)
+def generate_weekly_insights(food_logs: list[FoodLog], symptoms: list[SymptomLog]) -> list[str]:
     insights: list[str] = []
-    if gaps.is_sugar_over:
-        insights.append("Higher sugar intake may be linked with symptom patterns; keep watching this trend over time.")
-    if gaps.is_fiber_low:
-        insights.append("Fiber intake appeared below target this week and may be worth prioritizing in next meals.")
-    rec_count = int(await db.scalar(select(func.count()).select_from(RecommendationLog).where(RecommendationLog.user_id == user_id)) or 0)
-    if rec_count:
-        insights.append(f"You received {rec_count} recommendations; acceptance patterns may help tune future suggestions.")
+    days_with_food = len({log.logged_at.date() for log in food_logs if log.logged_at is not None})
+    if days_with_food > 0:
+        weekly_nutrition = summarize_food_logs(food_logs)
+        avg_daily_sugar = weekly_nutrition.sugar_consumed / days_with_food
+        avg_daily_fiber = weekly_nutrition.fiber_consumed / days_with_food
+        if avg_daily_sugar > 30:
+            insights.append("Average daily sugar was above target this week — high-sugar days often correlate with next-day symptom flares.")
+        if avg_daily_fiber < 25:
+            insights.append("Average daily fiber was below target this week — aim for more vegetables, legumes, and whole grains.")
+    if symptoms:
+        pain_scores = [log.pain_score for log in symptoms]
+        avg_pain = sum(pain_scores) / len(pain_scores)
+        if avg_pain >= 6:
+            insights.append(f"Average pain this week was {avg_pain:.1f}/10 — consider logging lifestyle factors to find patterns.")
+        flare_days = sum(1 for log in symptoms if log.flare_level in {FlareLevel.MODERATE, FlareLevel.SEVERE})
+        if flare_days >= 3:
+            insights.append(f"{flare_days} flare days logged this week — review recent meals and sleep for common triggers.")
     if not insights:
-        insights.append("Your logged nutrition and symptoms may reveal clearer patterns as more days are recorded.")
+        insights.append("Keep logging meals and symptoms — patterns become visible after a full week of data.")
     return insights[:4]
 
 

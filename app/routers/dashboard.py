@@ -44,15 +44,17 @@ class WeeklyDashboardResponse(BaseModel):
     best_day: date | None
     worst_day: date | None
     insights: list[str]
+    pain_trend: list[dict]
 
 
 @router.get("/today", response_model=TodayDashboardResponse)
 async def get_today_dashboard_endpoint(
     diet_override: Annotated[str | None, Query(pattern="^(vegetarian|non_vegetarian)$")] = None,
+    meal_type: Annotated[str | None, Query(pattern="^(breakfast|lunch|snack|dinner)$")] = None,
     db: AsyncSession = Depends(get_db_session),
     user_id: str = Depends(require_current_user_id),
 ) -> TodayDashboardResponse:
-    dashboard = await get_today_dashboard(db, UUID(user_id), diet_override=diet_override)
+    dashboard = await get_today_dashboard(db, UUID(user_id), diet_override=diet_override, meal_type=meal_type)
     gaps = get_nutrition_gaps(dashboard.nutrition)
     rec = dashboard.next_recommendation
     return TodayDashboardResponse(
@@ -101,7 +103,8 @@ async def get_today_dashboard_endpoint(
 
 @router.get("/weekly", response_model=WeeklyDashboardResponse)
 async def get_weekly_dashboard_endpoint(
+    week_offset: Annotated[int, Query(ge=-52, le=0)] = 0,
     db: AsyncSession = Depends(get_db_session),
     user_id: str = Depends(require_current_user_id),
 ) -> WeeklyDashboardResponse:
-    return await get_weekly_dashboard(db, UUID(user_id))
+    return await get_weekly_dashboard(db, UUID(user_id), week_offset=week_offset)

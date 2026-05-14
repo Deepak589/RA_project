@@ -57,10 +57,10 @@ async def submit_recommendation_feedback_endpoint(
     recommendation_id: UUID,
     data: RecommendationFeedbackUpdate,
     db: AsyncSession = Depends(get_db_session),
-    _: str = Depends(require_current_user_id),
+    user_id: str = Depends(require_current_user_id),
 ) -> dict[str, str]:
     feedback = data.feedback or data.feedback_status or RecommendationFeedbackStatus.PENDING
-    return await submit_feedback(db, recommendation_id, feedback, data.replacement_meal_id)
+    return await submit_feedback(db, recommendation_id, feedback, data.replacement_meal_id, UUID(user_id))
 
 
 @router.get("/history", response_model=RecommendationHistoryResponse)

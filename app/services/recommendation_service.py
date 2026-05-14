@@ -34,10 +34,13 @@ async def submit_feedback(
     recommendation_id: UUID,
     feedback: RecommendationFeedbackStatus | str,
     replacement_meal_id: UUID | None = None,
+    user_id: UUID | None = None,
 ) -> dict[str, str]:
     log = await db.get(RecommendationLog, recommendation_id)
     if log is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recommendation not found")
+    if user_id is not None and log.user_id != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
     feedback_status = RecommendationFeedbackStatus(feedback)
     log.feedback_status = feedback_status
     if feedback_status == RecommendationFeedbackStatus.REPLACED:

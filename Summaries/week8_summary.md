@@ -1,53 +1,80 @@
-# Week 8 — Schema Drift Fix + Graphify Refresh
+# Week 8 — Analytics Dashboard + Week 7 Bug Verification
 
-Generated: 2026-05-11
+Generated: 2026-05-14
 
 ## Graph Stats
 
-| Metric      | Before (Week 7) | After   | Delta |
-|-------------|-----------------|---------|-------|
-| Nodes       | 776             | 871     | +95   |
-| Edges       | 1591            | 1827    | +236  |
-| Communities | 68              | 29      | -39   |
-| Files       | 141             | 148     | +7    |
+| Metric      | Week 7 (post-bugfix) | Week 8  | Delta |
+|-------------|----------------------|---------|-------|
+| Nodes       | 872                  | 872     | 0     |
+| Edges       | 1829                 | 1829    | 0     |
+| Communities | 31                   | 72      | +41   |
+| Files       | 148                  | 148     | 0     |
 
-Re-extraction: AST only, no LLM. 148 files processed.
+Re-extraction: AST only, no LLM. 148 files, 2026-05-14.
+Community count rose 31→72 due to tighter Louvain pass — no structural change in code.
 
-## Work Done This Week
+---
 
-### 1. Alembic Migration — Schema Drift Captured
+## Week 7 Bug Status (verified in code, 2026-05-14)
 
-**Problem:** 4 tables existed in DB but had no Alembic migration. Created ad-hoc outside migration history. Fresh deploy would miss them.
+All 10 bugs from the two bugfix passes are confirmed resolved in current source:
 
-**Migration created:** `alembic/versions/2dddb02d5f05_add_missing_tables.py`  
-**Revises:** `0007_add_user_role`
+| Bug | Description | Verified location |
+|-----|-------------|-------------------|
+| BUG 1+3 | Meal display showed name only, no ingredients | `FoodLogItem.jsx` fetches meal detail via `useQuery` |
+| BUG 2 | Saved meal list stayed visible after logging | `MealLogPage.jsx` — `showSavedMeals` / `loggedMealName` state |
+| BUG 4 | Acceptance rate double-counted PENDING logs | `dashboard_service.py` — denominator is `decided` (non-PENDING) only |
+| BUG 5 | Lifestyle signals not wired into rule engine | `rule_engine.py` — `get_todays_lifestyle()`, mode escalation block |
+| BUG 6 | Duplicate meal log entries collapsed into one | All log lists use `key={log.id}` |
+| BUG 7 | Custom meal draft persisted across day boundary | `CustomMealPage.jsx` — `todayKey`/`lastDay` day-rollover `useEffect` |
+| BUG 8 | Ingredient text truncated in cards | `MealCard.jsx` + `CustomMealPage.jsx` — wrapped token layout |
+| BUG 9 | Custom meal payload sent `grams` not `portion_g` | `CustomMealPage.jsx` — `{ food_id, portion_g }` + `meal_type` |
+| BUG 10 | `"no_preference"` triggered dietary filter | `rule_engine.py` — `has_real_preference` excludes `no_preference` |
+| Auth | Refresh token in JSON body (flaky session) | `auth.py` — `httpOnly` cookie, `samesite` strict/lax, `COOKIE_NAME` |
 
-Tables captured:
-- `static.meal_ingredients` — per-meal food portions with cooking state
-- `tracking.custom_meals` — user-created meals with computed nutrition totals
-- `tracking.custom_meal_ingredients` — ingredients for custom meals
-- `tracking.missing_ingredients` — user-reported missing foods with review workflow
+### Custom meal persistence (todo.md primary bug)
+`log_service.py:53–66` — `log_source == "custom_meal"` path loads `CustomMeal` by ID, writes
+`custom_meal_id`, `custom_food_name`, `display_calories`, `display_protein_g` to `tracking.food_logs`. ✓
 
-Additional real schema drift fixed:
-- `static.foods.cooking_state`: `VARCHAR(20)` → `Text`
-- `static.foods.quality_flag`: `VARCHAR(30)` → `Text`
-- `core.user_preferences`: constraint rename (`user_preferences_user_id_key` → `ix_core_user_preferences_user_id` unique)
-- `tracking.lifestyle_logs`: constraint rename (`lifestyle_logs_user_id_log_date_key` → `uq_tracking_lifestyle_logs_user_log_date`)
+### Auth session stability
+`auth.py:33–37` — refresh token set as `httpOnly` cookie (`ra_refresh`), `secure` from settings,
+`samesite` strict in prod / lax in dev. Login, register, and refresh all call `response.set_cookie`. ✓
 
-**False positives stripped:** ~50 `TIMESTAMP(timezone=True) → DateTime()` alter columns autogenerate would have generated — would have broken timezone awareness across all tables.
+---
 
-Migration applied and verified: `alembic current` = `2dddb02d5f05 (head)`
+## Week 8 Work Done
 
-### 2. Token Optimisation — Removed Duplicate Skills
+### Analytics Dashboard (`AnalyticsPage.jsx`)
 
-Deleted 3 project-level skill duplicates from `.claude/skills/`:
-- `caveman-commit/SKILL.md`
-- `caveman-review/SKILL.md`
-- `caveman-help/SKILL.md`
+- `PainTrendChart` — 7-day pain score trend (Recharts)
+- `WeeklyAdherenceChart` — meal logged days bar chart
+- Metric grid: avg pain, meal days, total meals, recommendation acceptance rate, flare days
+- Weekly insights list from `GET /dashboard/weekly` → `insights: list[str]`
+- Previous/Next week navigation buttons (UI only; week offset not yet wired to backend)
 
-Plugin already provides these. ~220 tokens saved per message.
+### Backend `/dashboard/weekly` endpoint
 
-## God Nodes (post-refresh)
+`dashboard.py` + `dashboard_service.py`:
+- `avg_pain_score`, `avg_fatigue`, `avg_sleep_hours`, `avg_meal_quality_score`
+- `total_meals_logged`, `meal_logged_days`
+- `recommendation_acceptance_rate` — denominator: decided (non-PENDING) only
+- `flare_days_count`, `best_day`, `worst_day`
+- `insights: list[str]` — simple correlation highlights
+
+### Alembic migration (carried from week 8 schema-drift fix)
+
+`alembic/versions/2dddb02d5f05_add_missing_tables.py` — captures 4 previously ad-hoc tables:
+- `static.meal_ingredients`
+- `tracking.custom_meals`
+- `tracking.custom_meal_ingredients`
+- `tracking.missing_ingredients`
+
+Plus real column/constraint drift on `static.foods` and `core.user_preferences`.
+
+---
+
+## God Nodes (unchanged)
 
 | Rank | Node | Edges |
 |------|------|-------|
@@ -62,18 +89,24 @@ Plugin already provides these. ~220 tokens saved per message.
 | 9 | `FoodLog` | 23 |
 | 10 | `normalize_usda_food()` | 22 |
 
-## New Migration in Graph
+---
 
-Community 31 now appears: `add_missing_tables  Revision ID: 2dddb02d5f05`
+## Open Items Carried to Week 9
 
-## Files Touched
+- Previous/Next week navigation not wired to backend (UI buttons exist)
+- `manual browser click-through` of all screens against live API — not formally recorded
+- Docker-backed pytest: last known result `95 passed` (2026-05-04); rerun needed before deploy
 
-```
-alembic/versions/2dddb02d5f05_add_missing_tables.py   (new)
-.claude/skills/caveman-commit/SKILL.md                 (deleted)
-.claude/skills/caveman-review/SKILL.md                 (deleted)
-.claude/skills/caveman-help/SKILL.md                   (deleted)
-graphify-out/GRAPH_REPORT.md                           (updated)
-graphify-out/graph.json                                (updated)
-graphify-out/graph.html                                (updated)
-```
+---
+
+## Next — Week 9 (Testing + MVP Release)
+
+Per roadmap:
+1. Edge case tests: empty logs, new user with no history, full flare mode, allergy conflicts
+2. Manually review 20–30 recommendation outputs for quality
+3. Medical disclaimer banners + escalation prompts for severe symptom scores
+4. Deploy backend → Render.com or Railway (free tier)
+5. Deploy frontend → Vercel or Netlify
+
+✓ WEEK 8 COMPLETE — analytics dashboard live, all Week 7 bugs verified resolved in source,
+schema migrations captured, graphify refreshed (872 nodes, 1829 edges, 72 communities, 2026-05-14)

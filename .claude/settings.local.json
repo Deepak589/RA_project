@@ -23,7 +23,13 @@
       "Bash(python -m pytest tests/services/test_recommendation_loop.py -v --no-header)",
       "Bash(docker exec ra_project-db-1 *)",
       "Bash(docker exec ra_project-api-1 *)",
-      "Bash(python -m pytest tests/services/test_jwt_issuer.py tests/services/test_anti_inflammatory_scorer.py tests/services/test_food_normalizer.py tests/services/test_nutrition_tracker.py tests/services/test_variety_penalty.py -v -q)"
+      "Bash(python -m pytest tests/services/test_jwt_issuer.py tests/services/test_anti_inflammatory_scorer.py tests/services/test_food_normalizer.py tests/services/test_nutrition_tracker.py tests/services/test_variety_penalty.py -v -q)",
+      "Bash(docker compose exec -T db psql -U postgres -d ra_app -c ' *)",
+      "Bash(curl -s http://localhost:8000/api/v1/dashboard/today?meal_type=breakfast -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OTdmMDE1Ni0wZDQxLTQxNDMtYTZjNC0xNmFjOWIzNzdiMGIiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzc4NzczODY2LCJleHAiOjE3Nzg3NzU2NjYsImlzcyI6InJhLWFwcCIsImp0aSI6ImEyYWI5NGRhLWMxZTktNDc4YS05YTc4LTgyYTI1YmVhOTNkYyJ9.DGpjGqUf9vvMkmevQdb7VgWrnEzZW98lFOFdXkVFYso')",
+      "Bash(python -m json.tool --no-ensure-ascii)",
+      "Bash(curl -s 'http://localhost:8000/api/v1/dashboard/today?meal_type=lunch&diet_override=vegetarian' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OTdmMDE1Ni0wZDQxLTQxNDMtYTZjNC0xNmFjOWIzNzdiMGIiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzc4NzczODY2LCJleHAiOjE3Nzg3NzU2NjYsImlzcyI6InJhLWFwcCIsImp0aSI6ImEyYWI5NGRhLWMxZTktNDc4YS05YTc4LTgyYTI1YmVhOTNkYyJ9.DGpjGqUf9vvMkmevQdb7VgWrnEzZW98lFOFdXkVFYso')",
+      "Bash(python -c ' *)",
+      "Bash(docker compose *)"
     ],
     "deny": [
       "Bash(rm -rf *)",
