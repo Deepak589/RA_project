@@ -34,7 +34,15 @@
       "Bash(python -m json.tool)",
       "Bash(curl -s -H \"Authorization: Bearer rnd_UVb8HobZqQNeVGDuEE69AlgnNHOM\" \"https://api.render.com/v1/services/srv-d833623eo5us73dvogb0/events?limit=10\")",
       "Bash(curl -s -H \"Authorization: Bearer rnd_UVb8HobZqQNeVGDuEE69AlgnNHOM\" \"https://api.render.com/v1/services/srv-d833623eo5us73dvogb0/deploys/dep-d833mjd7vvec73ejjpd0\")",
-      "Bash(curl -s -H 'Authorization: Bearer rnd_UVb8HobZqQNeVGDuEE69AlgnNHOM' 'https://api.render.com/v1/logs?resource=srv-d833623eo5us73dvogb0&limit=100')"
+      "Bash(curl -s -H 'Authorization: Bearer rnd_UVb8HobZqQNeVGDuEE69AlgnNHOM' 'https://api.render.com/v1/logs?resource=srv-d833623eo5us73dvogb0&limit=100')",
+      "Bash(curl -s -H \"Authorization: Bearer vck_0DH0cYNOKd0OBVHtsxVvRZ2Fbx5Nayb2FqR3opniegZ5fqkV4T0bwfr8\" \"https://api.vercel.com/v9/projects?teamId=team_WzGXKe3DjtFwl4RH38LM5voN\")",
+      "Bash(curl -s -H \"Authorization: Bearer vck_0DH0cYNOKd0OBVHtsxVvRZ2Fbx5Nayb2FqR3opniegZ5fqkV4T0bwfr8\" \"https://api.vercel.com/v6/deployments?teamId=team_WzGXKe3DjtFwl4RH38LM5voN&limit=5\")",
+      "Bash(curl -s -H \"Authorization: Bearer vck_0DH0cYNOKd0OBVHtsxVvRZ2Fbx5Nayb2FqR3opniegZ5fqkV4T0bwfr8\" \"https://api.vercel.com/v9/projects/ra-project?teamId=team_WzGXKe3DjtFwl4RH38LM5voN\")",
+      "Bash(curl -s -H \"Authorization: Bearer vck_0DH0cYNOKd0OBVHtsxVvRZ2Fbx5Nayb2FqR3opniegZ5fqkV4T0bwfr8\" \"https://api.vercel.com/v2/teams\")",
+      "Bash(curl *)",
+      "Bash(grep -oP 'baseURL[^,}]{0,80}')",
+      "Bash(PGPASSWORD=npg_MIKweV2Bjf4D \"/c/Program Files/PostgreSQL/18/bin/psql\" \"host=ep-broad-hat-aplv1l7y-pooler.c-7.us-east-1.aws.neon.tech port=5432 dbname=neondb user=neondb_owner sslmode=require\" -c \"SELECT version_num FROM core.alembic_version;\")",
+      "Bash(PGPASSWORD=npg_MIKweV2Bjf4D \"/c/Program Files/PostgreSQL/18/bin/psql\" \"host=ep-broad-hat-aplv1l7y-pooler.c-7.us-east-1.aws.neon.tech port=5432 dbname=neondb user=neondb_owner sslmode=require\" -c \"SELECT conname, pg_get_constraintdef\\(oid\\) FROM pg_constraint WHERE conname='ck_meals_valid_meal_type';\")"
     ],
     "deny": [
       "Bash(rm -rf *)",
