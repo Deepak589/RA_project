@@ -1,0 +1,268 @@
+You are an expert software architect and database designer helping build a 
+Rheumatoid Arthritis (RA) Nutrition and Lifestyle App.
+
+Week 1 is complete. You have a full requirements document. Week 2 mission 
+is to produce the complete database design: a finalised PostgreSQL schema, 
+a full ER diagram, and the project folder structure.
+
+ADDITIONAL DATABASE DESIGN RULES:
+- Use 4 PostgreSQL schemas: core, static, tracking, intelligence
+- core → users, user_preferences, user_medications, 
+  auth_sessions, account_deletion_requests
+- static → foods, meals, meal_items
+- tracking → food_logs, symptom_logs, lifestyle_logs
+- intelligence → recommendation_logs, feedback_logs
+- User is root parent object — every user-owned table has 
+  user_id FK referencing core.users.id with ondelete CASCADE
+- Cross-schema FK format: "core.users.id" not just "users.id"
+- Use UUID primary keys, TIMESTAMPTZ, JSONB throughout
+
+═══════════════════════════════════════════════════════════
+CONTEXT FROM WEEK 1 — READ BEFORE STARTING
+═══════════════════════════════════════════════════════════
+
+Stack: FastAPI (Python) + PostgreSQL + React + Vite
+ORM: SQLAlchemy with Alembic migrations
+
+Resolved decisions:
+- Food data: USDA FoodData Central API (external_source + external_id fields)
+- Meals: curated meals only in V1; free-text custom log entries allowed
+- Notifications: deferred to V2
+- Account deletion: included in V1; data export deferred to V2
+- Recommendation route: GET /recommendations/next (not /meals/recommendation)
+- Rule priority: Safety → Flare state → Nutrition balance → 
+  User preferences → Anti-inflammatory score → Variety
+
+Entities already defined (rough, from Week 1 appendix):
+users, user_preferences, user_medications, foods, meals, meal_items,
+food_logs, symptom_logs, lifestyle_logs, recommendation_logs,
+authentication_sessions
+
+Key relationships:
+- users 1→1 user_preferences
+- users 1→many: food_logs, symptom_logs, lifestyle_logs,
+  recommendation_logs, authentication_sessions, user_medications
+- meals 1→many meal_items
+- meal_items links meals → foods
+- food_logs may reference food_id, meal_id, or custom_food_name
+- recommendation_logs stores alternatives_json, rules_applied_json,
+  recommendation_context_json, and optional replacement_food_id
+
+═══════════════════════════════════════════════════════════
+WEEK 2 MISSION: DATABASE DESIGN + PROJECT SCAFFOLDING
+═══════════════════════════════════════════════════════════
+
+Complete every task fully before moving to the next.
+
+───────────────────────────────────────────────────────────
+TASK 1 — FINALISE THE POSTGRESQL SCHEMA
+───────────────────────────────────────────────────────────
+
+For every table, define:
+- Final column names with PostgreSQL data types
+- Primary key (use UUID not integer for user-facing IDs)
+- Foreign keys and ON DELETE behaviour for each
+- NOT NULL constraints where appropriate
+- DEFAULT values where sensible
+- Any CHECK constraints (e.g. pain_score between 0 and 10)
+- Indexes beyond the primary key that will matter for query performance
+
+Tables to produce:
+1. users
+2. user_preferences
+3. user_medications
+4. foods
+5. meals
+6. meal_items
+7. food_logs
+8. symptom_logs
+9. lifestyle_logs
+10. recommendation_logs
+11. authentication_sessions
+12. account_deletion_requests (needed for V1 account deletion feature)
+
+For each table write the full CREATE TABLE SQL statement.
+
+Design rules to follow:
+- Use UUID primary keys on all tables
+- Use TIMESTAMPTZ not TIMESTAMP for all datetime fields
+- Store JSON columns as JSONB not JSON in PostgreSQL
+- flare_level should be an ENUM type: none, mild, moderate, severe
+- feedback_status in recommendation_logs should be ENUM: 
+  pending, accepted, skipped, replaced
+- lifestyle_logs should UNIQUE on (user_id, log_date) to enforce 
+  one record per day (upsert pattern)
+- authentication_sessions refresh_token_hash should be indexed
+- food_logs.logged_at and symptom_logs.logged_at should be indexed 
+  for date-range queries
+
+───────────────────────────────────────────────────────────
+TASK 2 — PRODUCE THE ER DIAGRAM
+───────────────────────────────────────────────────────────
+
+Write a Mermaid erDiagram block showing all 12 tables, their key 
+fields, and relationships with cardinality labels.
+
+Use standard Mermaid ER syntax:
+erDiagram
+  TABLE_NAME {
+    type column_name
+  }
+  TABLE_A ||--o{ TABLE_B : "relationship label"
+
+Show every foreign key relationship. Group related tables visually.
+
+───────────────────────────────────────────────────────────
+TASK 3 — WRITE THE ALEMBIC MIGRATION FILES
+───────────────────────────────────────────────────────────
+
+Write the initial Alembic migration (versions/0001_initial_schema.py) 
+that creates all 12 tables in the correct dependency order.
+
+Requirements:
+- Create ENUM types before the tables that use them
+- Create tables in foreign key dependency order 
+  (users first, then dependent tables)
+- Include both upgrade() and downgrade() functions
+- downgrade() should drop tables in reverse order and drop ENUM types
+
+───────────────────────────────────────────────────────────
+TASK 4 — DEFINE THE PROJECT FOLDER STRUCTURE
+───────────────────────────────────────────────────────────
+
+Define the complete folder and file structure for the full project.
+Include both the backend (FastAPI) and frontend (React + Vite).
+
+Backend structure should include:
+- app/ with routers/, models/, schemas/, services/, core/, db/
+- alembic/ with versions/
+- tests/ with structure mirroring app/
+- .env.example, requirements.txt, Dockerfile, docker-compose.yml
+
+Frontend structure should include:
+- src/ with components/, pages/, hooks/, api/, store/, utils/
+- public/
+- vite.config.js, .env.example
+
+For each folder write a one-line comment explaining its purpose.
+
+───────────────────────────────────────────────────────────
+TASK 5 — WRITE THE SQLALCHEMY MODELS
+───────────────────────────────────────────────────────────
+
+Write the SQLAlchemy ORM model class for every table using:
+- SQLAlchemy 2.0 style (DeclarativeBase)
+- Mapped[] type annotations
+- relationship() declarations with back_populates
+- repr methods for debugging
+
+Produce one file per model group:
+- models/user.py: User, UserPreferences, UserMedication, 
+  AuthenticationSession, AccountDeletionRequest
+- models/food.py: Food, Meal, MealItem
+- models/log.py: FoodLog, SymptomLog, LifestyleLog
+- models/recommendation.py: RecommendationLog
+
+───────────────────────────────────────────────────────────
+TASK 6 — WRITE THE PYDANTIC SCHEMAS
+───────────────────────────────────────────────────────────
+
+For each major entity write the Pydantic v2 schemas:
+- Base schema (shared fields)
+- Create schema (fields needed on POST)
+- Response schema (fields returned to the client)
+
+Produce one file per schema group matching the model files.
+
+───────────────────────────────────────────────────────────
+TASK 7 — SET UP THE DATABASE CONNECTION AND CONFIG
+───────────────────────────────────────────────────────────
+
+Write the following files:
+- app/db/session.py: async SQLAlchemy engine and session factory
+- app/core/config.py: Settings class using pydantic-settings 
+  reading from .env
+- app/core/security.py: password hashing (bcrypt) and JWT creation 
+  and verification functions
+- .env.example with all required environment variable keys
+
+Required environment variables:
+DATABASE_URL, SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES,
+REFRESH_TOKEN_EXPIRE_DAYS, USDA_API_KEY, ENVIRONMENT
+
+───────────────────────────────────────────────────────────
+TASK 8 — WRITE DOCKER SETUP
+───────────────────────────────────────────────────────────
+
+Write:
+- Dockerfile for the FastAPI backend
+- docker-compose.yml with services: api, db (postgres:16), 
+  and optionally pgadmin for local development
+- Include health checks for the db service
+- Mount a volume for Postgres data persistence
+
+───────────────────────────────────────────────────────────
+TASK 9 — PRODUCE THE WEEK 2 HANDOFF SUMMARY
+───────────────────────────────────────────────────────────
+
+Write a short week2_summary.md that records:
+- Final table count and names
+- Key design decisions made and why
+- Any fields or constraints that differ from the Week 1 entity list 
+  and why they changed
+- What is ready for Week 3 (nutrition data ingestion)
+- Open questions or assumptions that Week 3 should be aware of
+
+═══════════════════════════════════════════════════════════
+EXECUTION RULES
+═══════════════════════════════════════════════════════════
+
+- Complete every task fully before moving to the next
+- Write real, runnable SQL and Python code — no pseudocode
+- If you spot a design problem not covered in Week 1 context, 
+  flag it with [DESIGN DECISION: ...] and make a reasonable choice
+- At the end of each task print: ✓ TASK [N] COMPLETE
+- When all tasks are done print: ✓ WEEK 2 COMPLETE — ready for Week 3
+- Save all output files into the project folder structure defined in Task 4
+
+Begin now with Task 1.
+
+EXECUTION OUTPUT RULES:
+- Do not just document — write and save every file to disk
+- After each task, immediately create the actual files in the 
+  project folder structure
+- No pseudocode, no placeholders — all code must be 
+  complete and runnable
+
+Files to create and save:
+
+Task 1 → save as: database/schema.sql
+Task 2 → save as: database/er_diagram.mmd
+Task 3 → save as: alembic/versions/0001_initial_schema.py
+Task 4 → create every folder and file in the structure
+          (empty __init__.py files where needed)
+Task 5 → save as:
+          app/models/user.py
+          app/models/food.py
+          app/models/log.py
+          app/models/recommendation.py
+Task 6 → save as:
+          app/schemas/user.py
+          app/schemas/food.py
+          app/schemas/log.py
+          app/schemas/recommendation.py
+Task 7 → save as:
+          app/db/session.py
+          app/core/config.py
+          app/core/security.py
+          .env.example
+Task 8 → save as:
+          Dockerfile
+          docker-compose.yml
+Task 9 → save as: week2_summary.md
+
+After ALL files are written, run:
+- alembic upgrade head
+- verify all 4 schemas exist in PostgreSQL
+- verify all tables created under correct schemas
+- print: ✓ WEEK 2 COMPLETE — database live and ready for Week 3

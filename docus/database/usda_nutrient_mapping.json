@@ -1,0 +1,145 @@
+{
+  "source": "USDA FoodData Central",
+  "endpoint": "https://api.nal.usda.gov/fdc/v1/foods/search",
+  "search_params": {
+    "dataType_priority": [
+      "Foundation",
+      "SR Legacy"
+    ],
+    "pageSize": 3
+  },
+  "food_quality_note": "Prefer Foundation results first because they are usually less processed and more nutrient-accurate; use SR Legacy only as a fallback when Foundation has no results.",
+  "nutrient_id_to_column": {
+    "1008": {
+      "column": "calories",
+      "name": "Energy",
+      "unit": "kcal",
+      "default": 0.0
+    },
+    "1003": {
+      "column": "protein_g",
+      "name": "Protein",
+      "unit": "g",
+      "default": 0.0
+    },
+    "1005": {
+      "column": "carbs_g",
+      "name": "Carbohydrate, by difference",
+      "unit": "g",
+      "default": 0.0
+    },
+    "2000": {
+      "column": "sugar_g",
+      "name": "Sugars, total including NLEA",
+      "unit": "g",
+      "default": 0.0
+    },
+    "1079": {
+      "column": "fiber_g",
+      "name": "Fiber, total dietary",
+      "unit": "g",
+      "default": 0.0
+    },
+    "1093": {
+      "column": "sodium_mg",
+      "name": "Sodium, Na",
+      "unit": "mg",
+      "default": 0.0
+    },
+    "1004": {
+      "column": "fat_g",
+      "name": "Total lipid (fat)",
+      "unit": "g",
+      "default": 0.0
+    },
+    "1258": {
+      "column": "saturated_fat_g",
+      "name": "Fatty acids, total saturated",
+      "unit": "g",
+      "default": 0.0
+    },
+    "1404": {
+      "column": "omega3_g",
+      "name": "PUFA 18:3 n-3 c,c,c (ALA)",
+      "unit": "g",
+      "default": 0.0
+    },
+    "1405": {
+      "column": "omega3_g",
+      "name": "Omega-3 fallback from Week 3 prompt",
+      "unit": "g",
+      "default": 0.0
+    },
+    "1406": {
+      "column": "omega3_g",
+      "name": "Omega-3 fallback from Week 3 prompt",
+      "unit": "g",
+      "default": 0.0
+    },
+    "1278": {
+      "column": "omega3_g",
+      "name": "PUFA 20:5 n-3 (EPA), current USDA Foundation id",
+      "unit": "g",
+      "default": 0.0
+    },
+    "1272": {
+      "column": "omega3_g",
+      "name": "PUFA 22:6 n-3 (DHA), current USDA Foundation id",
+      "unit": "g",
+      "default": 0.0
+    },
+    "1280": {
+      "column": "omega3_g",
+      "name": "PUFA 22:5 n-3 (DPA), current USDA Foundation id included for practical total omega-3 estimate",
+      "unit": "g",
+      "default": 0.0
+    },
+    "1087": {
+      "column": "calcium_mg",
+      "name": "Calcium, Ca",
+      "unit": "mg",
+      "default": 0.0
+    },
+    "1114": {
+      "column": "vitamin_d_ug",
+      "name": "Vitamin D (D2 + D3)",
+      "unit": "ug",
+      "default": 0.0
+    }
+  },
+  "field_mapping": {
+    "external_source": "constant: usda",
+    "external_id": "fdcId",
+    "name": "description",
+    "brand_name": "brandOwner or brandName",
+    "category": "foodCategory mapped to internal category",
+    "serving_size_g": "servingSize when servingSizeUnit is g; default 100g",
+    "ingredients_text": "ingredients",
+    "metadata_jsonb": "full raw USDA search result object plus ingestion quality flags"
+  },
+  "data_quality_rules": {
+    "missing_nutrient": "default nutrient column to 0.0 and preserve raw result in metadata_jsonb",
+    "missing_serving_size": "default serving_size_g to 100.0",
+    "missing_food_category": "assign internal category other",
+    "no_results": "log [DATA ISSUE: no results for {term}] and continue",
+    "single_food_failure": "log error and continue next food",
+    "duplicate_external_id": "skip insert and log [SKIP: duplicate {external_id}]"
+    ,
+    "data_type_priority": "search Foundation first, then SR Legacy fallback to avoid processed matches for simple foods"
+  },
+  "unmapped_usda_fields": {
+    "foodNutrients": "only selected nutrient IDs are normalized to columns; full list remains in metadata_jsonb",
+    "dataType": "preserved in metadata_jsonb for provenance",
+    "publishedDate": "preserved in metadata_jsonb for provenance",
+    "foodMeasures": "preserved in metadata_jsonb; V1 does not normalize household measures",
+    "score": "USDA search relevance only; preserved in metadata_jsonb, not used in nutrition scoring",
+    "additionalDescriptions": "preserved in metadata_jsonb for search/debug context"
+  },
+  "sample_terms_inspected": [
+    "chicken breast",
+    "kidney beans",
+    "spinach",
+    "salmon",
+    "brown rice"
+  ]
+}

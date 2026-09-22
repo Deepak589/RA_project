@@ -1,0 +1,1229 @@
+You are an expert React developer helping build a
+Rheumatoid Arthritis (RA) Nutrition and Lifestyle App.
+
+Weeks 1–6 are complete. The backend is fully built,
+tested, and documented. Week 7 mission is to build
+the complete React frontend.
+
+Stack:
+- React + Vite
+- Tailwind CSS
+- React Query (data fetching + caching)
+- React Router v6 (navigation)
+- Recharts (charts on dashboard)
+- Axios (HTTP client)
+
+Visual style:
+- Simple and clean — focus on usability
+- Mobile-first — RA patients log on phone
+- Calm colour palette — avoid harsh colours
+  Primary: teal/green tones (health, calm)
+  Accent: soft orange for alerts/escalation
+  Background: off-white, not pure white
+  Text: dark grey, not pure black
+- Large tap targets — RA patients may have
+  joint pain in hands, buttons >= 44px tall
+- Clear readable fonts — minimum 16px body
+- No unnecessary animations or complexity
+- Cards for content grouping
+- Bottom navigation bar for mobile
+- Simple icons — use lucide-react
+
+Do NOT change any backend code.
+Do NOT change any database schema.
+Write and save all files to disk. No pseudocode.
+
+═══════════════════════════════════════════════════════════
+CONTEXT FROM WEEKS 1–6
+═══════════════════════════════════════════════════════════
+
+Backend: FastAPI running in Docker
+API base URL: read from .env
+  VITE_API_BASE_URL=http://localhost:8000
+
+API contract: docs/api_contract.md
+  Use this as source of truth for all
+  endpoint shapes and error handling
+
+Migration chain:
+  0001 through 0006 complete
+  0007 → first task this week (admin role)
+
+Auth strategy:
+  access_token → React context (memory only)
+  refresh_token → httpOnly cookie
+  On app mount → auto call POST /auth/refresh
+  On 401 → refresh → retry → redirect to login
+  NEVER use localStorage or sessionStorage
+
+Token storage rule:
+  NEVER use localStorage — not supported
+  NEVER use sessionStorage
+  access_token in React AuthContext state only
+  refresh_token sent as httpOnly cookie
+    by backend Set-Cookie header
+
+Recommendation modes (from Week 6):
+  normal    → pain 0–3, no log today
+  mixed     → pain 4–5, mild flare
+  flare_only → pain 6–10, moderate/severe flare
+
+Pain-driven UI behaviour:
+  normal    → show balanced nutrition meals
+  mixed     → show 2 flare meals + 3 normal
+  flare_only → show only flare-safe meals
+               with soft orange banner:
+               "You reported pain today.
+                Showing gentle meals."
+
+Medical escalation:
+  pain >= 8 OR flare severe
+  → show prominent escalation card:
+    soft orange background
+    "Your symptoms sound severe. Please
+     contact your rheumatologist or seek
+     medical advice. This app provides
+     lifestyle support only."
+  → never block the user, just show warning
+
+81 tests currently passing (backend only)
+
+═══════════════════════════════════════════════════════════
+WEEK 7 MISSION: REACT FRONTEND
+═══════════════════════════════════════════════════════════
+
+Complete every task fully before moving to next.
+Write and save all files to disk. No pseudocode.
+
+───────────────────────────────────────────────────────────
+TASK 1 — MIGRATION 0007: ADMIN ROLE COLUMN
+───────────────────────────────────────────────────────────
+
+Write migration:
+alembic/versions/0007_add_user_role.py
+
+Add to core.users:
+  role VARCHAR(20) default 'user'
+    values: user, admin
+
+Update app/core/security.py:
+  Add get_current_admin_user dependency:
+    verify token same as get_current_user
+    additionally check user.role == 'admin'
+    return 403 if role != admin
+
+Update admin-only endpoints to use
+get_current_admin_user dependency:
+  GET /api/v1/ingredients/missing
+  PATCH /api/v1/ingredients/missing/{id}
+
+Run migration:
+  alembic upgrade head
+
+Verify:
+  SELECT column_name, column_default
+  FROM information_schema.columns
+  WHERE table_schema = 'core'
+  AND table_name = 'users'
+  AND column_name = 'role';
+  → expect: role | user
+
+Print: ✓ TASK 1 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 2 — REACT PROJECT SETUP
+───────────────────────────────────────────────────────────
+
+The React project already exists from Week 2
+scaffolding. Review and complete the setup.
+
+Verify and install dependencies:
+  cd frontend
+  npm install
+
+Required packages (add if missing):
+  react-router-dom
+  @tanstack/react-query
+  axios
+  recharts
+  lucide-react
+  clsx (utility for conditional classes)
+
+Verify tailwind.config.js exists and
+includes content paths for src/**/*.jsx
+
+Create/verify .env file in frontend/:
+  VITE_API_BASE_URL=http://localhost:8000
+
+Create/verify vite.config.js:
+  server proxy for /api → backend
+  so CORS not needed in development
+
+Project folder structure:
+src/
+├── api/
+│   ├── client.js         ← axios instance
+│   ├── auth.js           ← auth API calls
+│   ├── foods.js          ← food API calls
+│   ├── meals.js          ← meal API calls
+│   ├── logs.js           ← log API calls
+│   ├── recommendations.js
+│   ├── dashboard.js
+│   ├── profile.js
+│   └── ingredients.js
+├── context/
+│   └── AuthContext.jsx   ← token + user state
+├── hooks/
+│   ├── useAuth.js
+│   ├── useMeals.js
+│   ├── useLogs.js
+│   ├── useRecommendation.js
+│   └── useDashboard.js
+├── components/
+│   ├── ui/               ← reusable primitives
+│   │   ├── Button.jsx
+│   │   ├── Card.jsx
+│   │   ├── Input.jsx
+│   │   ├── Select.jsx
+│   │   ├── Slider.jsx
+│   │   ├── Badge.jsx
+│   │   ├── Spinner.jsx
+│   │   └── EscalationBanner.jsx
+│   ├── layout/
+│   │   ├── AppLayout.jsx    ← shell + bottom nav
+│   │   ├── BottomNav.jsx    ← mobile nav bar
+│   │   └── PageHeader.jsx
+│   ├── meals/
+│   │   ├── MealCard.jsx
+│   │   ├── MealIngredientList.jsx
+│   │   └── FlareBanner.jsx
+│   ├── logs/
+│   │   ├── FoodLogItem.jsx
+│   │   ├── SymptomSlider.jsx
+│   │   └── NutritionSummary.jsx
+│   └── charts/
+│       ├── PainTrendChart.jsx
+│       ├── NutritionBarChart.jsx
+│       └── WeeklyAdherenceChart.jsx
+├── pages/
+│   ├── auth/
+│   │   ├── LoginPage.jsx
+│   │   ├── RegisterPage.jsx
+│   │   └── OnboardingPage.jsx
+│   ├── DashboardPage.jsx
+│   ├── RecommendationPage.jsx
+│   ├── MealLogPage.jsx
+│   ├── SymptomLogPage.jsx
+│   ├── LifestyleLogPage.jsx
+│   ├── CustomMealPage.jsx
+│   ├── AnalyticsPage.jsx
+│   └── ProfilePage.jsx
+├── utils/
+│   ├── formatters.js     ← date, number formatters
+│   └── validators.js     ← form validation helpers
+├── App.jsx
+└── main.jsx
+
+Print: ✓ TASK 2 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 3 — API CLIENT AND AUTH CONTEXT
+───────────────────────────────────────────────────────────
+
+Write: src/api/client.js
+
+Axios instance with:
+  baseURL: import.meta.env.VITE_API_BASE_URL
+  withCredentials: true
+    (sends httpOnly cookie with every request)
+
+Request interceptor:
+  Add Authorization: Bearer {access_token}
+  from AuthContext to every request
+
+Response interceptor:
+  On 401 response:
+    call POST /auth/refresh
+    if refresh succeeds:
+      update access_token in AuthContext
+      retry original request with new token
+    if refresh fails:
+      clear AuthContext
+      redirect to /login
+
+Write: src/context/AuthContext.jsx
+
+State:
+  user: null | UserObject
+  accessToken: null | string
+  isLoading: bool (true during initial refresh)
+  isAuthenticated: bool
+
+On mount:
+  call POST /auth/refresh automatically
+  if success → set user + accessToken
+  if fail → set isAuthenticated = false
+  set isLoading = false either way
+
+Functions:
+  login(email, password) → void
+    POST /auth/login
+    set user + accessToken from response
+    refresh_token set by backend cookie
+
+  logout() → void
+    POST /auth/logout
+    clear user + accessToken
+    redirect to /login
+
+  refreshToken() → bool
+    POST /auth/refresh
+    update accessToken
+    return true if success, false if fail
+
+Write: src/hooks/useAuth.js
+  const { user, isAuthenticated,
+          isLoading, login, logout }
+    = useAuth()
+  Reads from AuthContext
+
+Write: src/api/auth.js
+  login(email, password)
+  register(email, password, name)
+  logout()
+  refreshToken()
+  getMe()
+  updateMe(data)
+  changePassword(current, newPass)
+
+Print: ✓ TASK 3 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 4 — AUTH SCREENS
+───────────────────────────────────────────────────────────
+
+Write: src/pages/auth/LoginPage.jsx
+
+Design:
+  Centred card on off-white background
+  App name + tagline at top:
+    "RA Nutrition Guide"
+    "Your daily food and wellness companion"
+  Email input
+  Password input (toggle show/hide)
+  Login button (full width, teal, 48px tall)
+  Link to register page
+  Error message below button if login fails:
+    "Incorrect email or password"
+
+Behaviour:
+  On submit → call login()
+  Show spinner on button while loading
+  On success → navigate to /dashboard
+    or to /onboarding if no preferences set
+    (check if user.preferences exists)
+  On error → show error message
+
+Write: src/pages/auth/RegisterPage.jsx
+
+Fields:
+  Full name
+  Email
+  Password (min 8 chars)
+  Confirm password
+  Register button
+  Link back to login
+
+Validation (client-side before submit):
+  Name: required, min 2 chars
+  Email: valid format
+  Password: min 8 chars
+  Confirm password: must match
+
+On success → navigate to /onboarding
+
+Write: src/pages/auth/OnboardingPage.jsx
+
+Multi-step form (4 steps, progress bar at top):
+
+Step 1 — About you:
+  Height (cm)
+  Weight (kg)
+  Age
+  How long have you had RA? (years)
+
+Step 2 — Dietary preferences:
+  Are you vegetarian? (yes/no toggle)
+  Any food allergies?
+    (multi-select chips:
+     nuts, dairy, gluten, eggs, shellfish,
+     soy, or type your own)
+  Budget friendly meals? (yes/no toggle)
+
+Step 3 — Your goals:
+  What matters most to you?
+  (multi-select, pick up to 3):
+    Reduce inflammation
+    Better energy levels
+    Maintain a healthy weight
+    Improve sleep quality
+    Eat more balanced meals
+
+Step 4 — Your medications:
+  Do you take any RA medications?
+  (optional — skip button available)
+  Add medication name + dosage (free text)
+  Can add multiple
+  [VERIFY WITH CLINICIAN] disclaimer shown:
+  "Medication information helps us suggest
+   more suitable meals. Always follow your
+   doctor's advice."
+
+On complete → PUT /profile/preferences
+             POST /profile/medications (if any)
+             navigate to /dashboard
+
+Back button between steps
+Progress bar shows step 1/4, 2/4 etc.
+Skip button on step 4 (medications optional)
+
+Print: ✓ TASK 4 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 5 — APP LAYOUT AND NAVIGATION
+───────────────────────────────────────────────────────────
+
+Write: src/components/layout/AppLayout.jsx
+
+Structure:
+  Full screen mobile layout
+  Top area: PageHeader (title + optional action)
+  Middle area: page content (scrollable)
+  Bottom: BottomNav (fixed)
+
+Write: src/components/layout/BottomNav.jsx
+
+5 navigation items:
+  Home (house icon) → /dashboard
+  Meals (utensils icon) → /meals/log
+  + Log (plus circle, larger, teal)
+    → opens quick log modal
+    (log food, symptoms, or lifestyle)
+  Insights (bar chart icon) → /analytics
+  Profile (user icon) → /profile
+
+Active tab highlighted in teal
+Inactive tabs grey
+Labels below icons, 11px
+
+Write: src/components/layout/PageHeader.jsx
+  Title (left)
+  Optional right action button
+  Back arrow if nested page
+
+Write: src/App.jsx
+
+Routes:
+  / → redirect to /dashboard if auth
+      redirect to /login if not
+  /login → LoginPage (no auth required)
+  /register → RegisterPage (no auth required)
+  /onboarding → OnboardingPage (auth required)
+  /dashboard → DashboardPage (auth required)
+  /recommendations → RecommendationPage
+  /meals/log → MealLogPage
+  /meals/custom → CustomMealPage
+  /symptoms/log → SymptomLogPage
+  /lifestyle/log → LifestyleLogPage
+  /analytics → AnalyticsPage
+  /profile → ProfilePage
+
+Protected route wrapper:
+  PrivateRoute component
+  if isLoading → show full screen spinner
+  if not isAuthenticated → redirect /login
+  else → render children
+
+Print: ✓ TASK 5 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 6 — REUSABLE UI COMPONENTS
+───────────────────────────────────────────────────────────
+
+Write all components in src/components/ui/
+
+Button.jsx:
+  Props: variant (primary/secondary/danger/ghost)
+         size (sm/md/lg)
+         loading (bool) → show spinner
+         disabled, onClick, children
+  Primary: teal background, white text
+  Secondary: white background, teal border
+  Danger: soft red background
+  Ghost: no background, teal text
+  Min height: 44px always (accessibility)
+
+Card.jsx:
+  Props: children, className, onClick, padding
+  White background
+  Rounded corners (rounded-xl)
+  Subtle shadow (shadow-sm)
+  Border (border border-gray-100)
+
+Input.jsx:
+  Props: label, error, hint, type, ...rest
+  Label above input
+  Error message below in red
+  Hint text below in grey
+  Focus ring in teal
+  Min height 44px
+
+Select.jsx:
+  Props: label, options, error, ...rest
+  Same style as Input
+
+Slider.jsx:
+  Props: label, min, max, value, onChange,
+         showValue (bool), valueLabel
+  Used for pain score, fatigue, sleep etc.
+  Show current value prominently (28px bold)
+  Teal track colour
+  Large thumb for easy touch
+
+Badge.jsx:
+  Props: label, variant (green/orange/grey/red)
+  Small pill shape
+  Used for meal tags, cooking state etc.
+
+Spinner.jsx:
+  Teal spinning circle
+  Props: size (sm/md/lg)
+
+EscalationBanner.jsx:
+  Soft orange background (#FFF3E0)
+  Orange icon (alert triangle)
+  Bold title: "Please seek medical advice"
+  Body: escalation message from API
+  Never blocks interaction
+  Appears at top of relevant screen
+
+FlareBanner.jsx (in components/meals/):
+  Soft orange background
+  Message: "You reported pain today.
+    Showing gentle, easy-to-prepare meals."
+  Shown on recommendation screen when
+  mode = flare_only or mixed
+
+MealCard.jsx (in components/meals/):
+  Props: meal, onAccept, onSkip, compact
+  White card with:
+    Meal name (bold, 16px)
+    Meal type badge (breakfast/lunch etc.)
+    Anti-inflammatory score (teal pill)
+    is_flare_friendly badge (if true)
+    is_vegetarian badge (if true)
+    Key stats: calories, protein, fiber
+    Explanation text (italic, grey, 13px)
+    Two buttons: Accept / Skip (44px tall)
+  compact mode: no explanation, smaller stats
+    used for alternatives list
+
+NutritionSummary.jsx (in components/logs/):
+  Props: nutrition (DailyNutritionSummary)
+  Horizontal scroll row of stat pills:
+    Calories: X / 1800
+    Protein: Xg ← red if is_protein_low
+    Fiber: Xg ← red if is_fiber_low
+    Omega-3: Xg ← red if is_omega3_low
+    Sugar: Xg ← orange if is_sugar_over
+  Low/over values shown with coloured dot
+
+SymptomSlider.jsx (in components/logs/):
+  Wrapper around Slider with pain-specific
+  labels:
+  0 = No pain, 5 = Moderate, 10 = Severe
+  Color shifts: green → yellow → orange → red
+  as value increases
+
+Print: ✓ TASK 6 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 7 — HOME DASHBOARD SCREEN
+───────────────────────────────────────────────────────────
+
+Write: src/pages/DashboardPage.jsx
+
+API calls:
+  GET /api/v1/dashboard/today
+
+Layout (top to bottom):
+
+1. Greeting header:
+   "Good morning, {name}" (time-aware)
+   Today's date below in grey
+
+2. Escalation banner (if escalation_active):
+   EscalationBanner component
+   Shown prominently at top
+
+3. Flare banner (if flare_active):
+   FlareBanner component
+
+4. Today's nutrition summary:
+   NutritionSummary component
+   Shows calories, protein, fiber, omega3
+   Gaps highlighted in colour
+
+5. Next recommendation card:
+   MealCard component (full size)
+   Shows primary recommendation
+   Accept / Skip buttons
+   On Accept:
+     POST /recommendations/{id}/feedback
+     body: { feedback: "accepted" }
+     POST /logs/food
+     log_source: curated_recommendation
+   On Skip:
+     POST /recommendations/{id}/feedback
+     body: { feedback: "skipped" }
+     Show next alternative inline
+
+6. Quick log buttons row:
+   Three large buttons (full width, stacked):
+   [+ Log a meal]       → /meals/log
+   [+ Log symptoms]     → /symptoms/log
+   [+ Log lifestyle]    → /lifestyle/log
+   Each 48px tall, secondary variant
+
+7. Today's symptom snapshot (if logged):
+   Small card showing:
+   Pain: X/10 | Fatigue: X/10
+   Flare: yes/no | Sleep: Xh
+
+Loading state:
+  Skeleton cards while fetching
+  Never show empty white screen
+
+Error state:
+  "Could not load dashboard.
+   Pull to refresh."
+
+Write: src/hooks/useDashboard.js
+  useQuery for GET /dashboard/today
+  useQuery for GET /dashboard/weekly
+  Refetch every 5 minutes
+
+Print: ✓ TASK 7 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 8 — RECOMMENDATION SCREEN
+───────────────────────────────────────────────────────────
+
+Write: src/pages/RecommendationPage.jsx
+
+API calls:
+  GET /api/v1/recommendations/next
+    ?meal_type={selected_type}
+  POST /api/v1/recommendations/{id}/feedback
+
+Layout:
+
+1. Meal type selector at top:
+   Horizontal pill tabs:
+   Breakfast | Lunch | Dinner | Snack
+   Auto-selected based on time of day
+   User can tap to change
+
+2. Flare banner (if mode = flare_only
+   or mixed)
+
+3. Primary recommendation:
+   Large MealCard (full detail)
+   Explanation text prominent
+   Score badge (teal)
+   Accept button (full width, teal, 48px)
+   Skip button (full width, ghost, 44px)
+
+4. Alternatives section:
+   "Other good options" header
+   Horizontal scroll row of compact
+   MealCards (4 alternatives)
+   Tap to expand to full detail
+
+5. Recommendation mode indicator:
+   Small text below:
+   normal → "Balanced nutrition meals"
+   mixed → "Gentle + nutritious options"
+   flare_only → "Gentle meals for today"
+
+On Accept:
+  POST feedback: accepted
+  POST /logs/food:
+    log_source: curated_recommendation
+    recommendation_meal_id: meal.id
+    calories: meal.total_calories
+    protein_g: meal.total_protein_g
+  Show success toast: "Meal logged ✓"
+  Refetch dashboard
+
+On Skip:
+  POST feedback: skipped
+  Refetch next recommendation
+  Show next primary from alternatives
+
+Write: src/hooks/useRecommendation.js
+  useQuery for /recommendations/next
+  useMutation for feedback
+  Auto-refetch when meal_type changes
+
+Print: ✓ TASK 8 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 9 — MEAL LOG SCREEN
+───────────────────────────────────────────────────────────
+
+Write: src/pages/MealLogPage.jsx
+
+This screen lets user search and log
+any food from the database.
+
+Layout:
+
+1. Search bar at top (sticky):
+   Placeholder: "Search foods..."
+   Debounced 300ms
+   Calls GET /api/v1/foods/search?q={term}
+
+2. Category filter chips below search:
+   All | Protein | Fish | Legume |
+   Vegetable | Grain | Fruit | Other
+   Calls GET /api/v1/foods/categories
+
+3. Search results list:
+   Each food item shows:
+     Food name
+     Cooking state badge (raw/cooked)
+     Calories per 100g
+     Protein per 100g
+     Anti-inflammatory score badge
+   Tap → opens portion entry sheet
+
+4. Portion entry bottom sheet:
+   Food name (bold header)
+   display_note shown if present
+     (raw vs cooked explanation)
+   Portion size input (grams)
+     default: 100g
+   Cooking state selector
+     (if food has raw version available)
+   Live nutrient preview:
+     "At 150g: 248 kcal, 48g protein"
+     updates as portion changes
+   Meal type selector:
+     Breakfast / Lunch / Dinner / Snack
+   [Log this food] button (teal, 48px)
+
+5. Today's food log below:
+   List of FoodLogItem components
+   Each shows: food name, portion, calories,
+               meal type, time logged
+   Swipe left → delete (with confirm)
+
+On log:
+  POST /api/v1/logs/food
+    log_source: manual_log
+    food_id: food.id
+    portion_g: entered value
+    meal_type: selected type
+    cooking_state_at_log: selected state
+    conversion_factor_at_log: food.conversion_factor
+    display_calories: food.calories *
+      conversion_factor * portion / 100
+    display_protein_g: food.protein_g *
+      conversion_factor * portion / 100
+  Show success toast
+  Refetch today's logs
+
+Write: src/hooks/useLogs.js
+  useQuery for today's food logs
+  useMutation for create food log
+  useMutation for delete food log
+
+Print: ✓ TASK 9 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 10 — SYMPTOM LOG SCREEN
+───────────────────────────────────────────────────────────
+
+Write: src/pages/SymptomLogPage.jsx
+
+This is one of the most important screens.
+Design it to be fast and frictionless.
+User may be in pain when logging.
+Large tap targets. Minimal typing.
+
+Layout:
+
+1. Header: "How are you feeling today?"
+
+2. Pain score slider:
+   SymptomSlider component
+   0–10 scale
+   Large number shown (40px bold)
+   Label updates:
+     0–2: "No pain"
+     3–4: "Mild"
+     5–6: "Moderate"
+     7–8: "Significant"
+     9–10: "Severe"
+   Color shifts green → red as value rises
+
+3. Fatigue level slider:
+   0–10 same pattern
+   Labels: None → Exhausted
+
+4. Morning stiffness:
+   "How long was morning stiffness?"
+   Button group: None | <30min | 30-60min
+                 1-2hrs | 2hrs+
+   Large buttons, easy to tap
+
+5. Swelling toggle:
+   "Any joint swelling today?"
+   Large YES / NO toggle buttons
+   48px tall each
+
+6. Flare level selector:
+   "Overall flare level:"
+   4 large cards in 2x2 grid:
+     None (green) | Mild (yellow)
+     Moderate (orange) | Severe (red)
+   Selected card has border + checkmark
+
+7. Optional notes:
+   "Any notes?" (collapsed by default)
+   Tap to expand text area
+   Keep it optional — do not force typing
+
+8. Save button (full width, teal, 56px):
+   "Save today's symptoms"
+   Prominent, always visible at bottom
+
+On save:
+  POST /api/v1/logs/symptoms
+  if escalation_triggered in response:
+    show EscalationBanner prominently
+    do NOT block or redirect user
+  Show success toast if no escalation
+  Refetch dashboard
+  Navigate back to dashboard after 2s
+
+Pre-fill if today's log exists:
+  GET /api/v1/logs/symptoms/today
+  Fill all sliders with existing values
+  Button becomes "Update today's symptoms"
+
+Print: ✓ TASK 10 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 11 — LIFESTYLE LOG SCREEN
+───────────────────────────────────────────────────────────
+
+Write: src/pages/LifestyleLogPage.jsx
+
+Fast, frictionless logging.
+All fields optional — user logs what they know.
+
+Layout:
+
+1. Sleep section:
+   "How did you sleep?"
+   Hours slider: 0–12 hours (0.5 increments)
+   Large number: "7.5 hours"
+
+2. Steps / activity:
+   "Steps today (approx):"
+   Button group:
+     <2000 | 2–5K | 5–10K | 10K+
+   "Exercise today?" YES / NO toggle
+   If YES:
+     Exercise type (free text, small input)
+     Duration: 15 / 30 / 45 / 60 / 90+ min
+
+3. Water intake:
+   "Water intake:"
+   Button group:
+     <1L | 1–1.5L | 1.5–2L | 2L+
+
+4. Stress level:
+   Slider 0–10
+   Labels: Relaxed → Overwhelmed
+
+5. Medication taken toggle:
+   "Did you take your RA medication today?"
+   Large YES / NO toggle (important field)
+   Teal YES, grey NO
+
+6. Smoking / alcohol toggles:
+   Simple YES / NO for each
+   No judgment language — just facts
+
+7. Save button (full width, teal, 56px)
+
+On save:
+  POST /api/v1/logs/lifestyle (upserts)
+  Show success toast
+  Navigate back to dashboard
+
+Pre-fill if today's log exists:
+  GET /api/v1/logs/lifestyle/today
+  Fill all fields
+
+Print: ✓ TASK 11 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 12 — CUSTOM MEAL BUILDER SCREEN
+───────────────────────────────────────────────────────────
+
+Write: src/pages/CustomMealPage.jsx
+
+Let user build their own meal from
+ingredients in the database.
+
+Layout:
+
+1. Meal name input at top
+2. Meal type selector
+   (Breakfast / Lunch / Dinner / Snack)
+
+3. Ingredient search:
+   Search bar: "Search ingredients..."
+   Calls POST /api/v1/ingredients/search
+   Results show food name + key stats
+   Tap ingredient → portion entry sheet:
+     Portion in grams (default 100g)
+     Cooking state selector
+     [Add to meal] button
+
+4. Current ingredients list:
+   Each added ingredient shows:
+     Name + portion_g
+     Calories contribution
+     Protein contribution
+     Remove button (X)
+
+5. Live nutrition preview panel:
+   Updates after every ingredient change
+   Calls POST /api/v1/meals/custom/calculate
+   Shows:
+     Total calories
+     Protein | Fiber | Sugar | Sodium
+     Anti-inflammatory score (large, teal)
+     is_vegetarian badge
+     is_flare_friendly badge
+
+6. Missing ingredient flow:
+   If search returns not found:
+   Show two buttons:
+     [Add to review list]
+       → POST /ingredients/missing
+         name only, no values
+       → Toast: "Added to our review list"
+     [I know the values]
+       → Opens form:
+         Calories, Protein, Carbs,
+         Fat, Fiber, Sugar (all optional)
+         Source (e.g. "from packet label")
+       → POST /ingredients/missing
+         with submitted values
+   Show note on meal card:
+     "{ingredient} excluded from score
+      — not in database yet"
+
+7. Save meal button (full width, teal):
+   [Save as "My protein lunch"]
+   Calls POST /api/v1/meals/custom
+   On success:
+     Option to log it immediately:
+     "Log this meal now?"
+     YES → POST /logs/food
+             log_source: custom_meal
+     NO → navigate to dashboard
+
+Print: ✓ TASK 12 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 13 — PROFILE SCREEN
+───────────────────────────────────────────────────────────
+
+Write: src/pages/ProfilePage.jsx
+
+API calls:
+  GET /api/v1/profile
+  PUT /api/v1/profile/preferences
+  POST /api/v1/profile/medications
+  DELETE /api/v1/profile/medications/{id}
+
+Layout:
+
+1. Profile header:
+   User name (large)
+   Email (grey, small)
+   Edit name button
+
+2. Dietary preferences section:
+   Vegetarian toggle
+   Allergies (chip list, tap to remove,
+              + button to add)
+   Goals (multi-select chips)
+   Budget friendly toggle
+   [Save preferences] button
+
+3. Medications section:
+   List of current medications
+   Each shows: name + dosage
+   Tap X to remove
+   [+ Add medication] button
+     → small bottom sheet:
+       Medication name (text)
+       Dosage (text, optional)
+       [Save] button
+   Disclaimer below:
+     "Medication details help us suggest
+      more suitable meals. Always follow
+      your doctor's guidance."
+     [VERIFY WITH CLINICIAN] note in grey
+
+4. Account section:
+   [Change password] → opens sheet
+   [Log out] → confirm dialog → logout()
+
+Write: src/hooks/useProfile.js
+  useQuery for GET /profile
+  useMutation for update preferences
+  useMutation for add medication
+  useMutation for remove medication
+
+Print: ✓ TASK 13 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 14 — ANALYTICS SCREEN (BASIC)
+───────────────────────────────────────────────────────────
+
+Write: src/pages/AnalyticsPage.jsx
+
+Note: Full analytics is Week 8.
+This week build the basic structure
+and connect the weekly dashboard data.
+
+API calls:
+  GET /api/v1/dashboard/weekly
+
+Layout:
+
+1. Week selector:
+   "This week" (default)
+   Left/right arrows for past weeks
+   (future: implement date navigation)
+
+2. Pain trend chart:
+   PainTrendChart component (Recharts)
+   Line chart: pain score per day
+   X axis: Mon–Sun
+   Y axis: 0–10
+   Teal line, orange dots
+   No data state: "Log symptoms to see trends"
+
+3. Key stats row (4 metric cards):
+   Avg pain this week
+   Days logged
+   Meals recommended accepted (%)
+   Flare days count
+
+4. Weekly insights:
+   List of insight strings from API
+   Each in a soft card
+   Hedged language preserved as-is
+   "No insights yet — keep logging
+    for 7 days to see patterns"
+
+5. Nutrition adherence (basic):
+   Simple bar:
+   "You logged meals X out of 7 days"
+   Green fill proportion
+
+Write: src/components/charts/PainTrendChart.jsx
+  Recharts LineChart
+  Props: data (array of {date, pain_score})
+  Responsive container
+  Tooltip showing date + pain score
+  Reference line at 5 (moderate threshold)
+
+Write: src/hooks/useDashboard.js (update)
+  Add useQuery for weekly dashboard
+
+Print: ✓ TASK 14 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 15 — CONNECT AND TEST FULL FLOW
+───────────────────────────────────────────────────────────
+
+Run the full frontend manually and verify:
+
+Flow 1 — New user:
+  → /register → fill form → submit
+  → /onboarding → complete all 4 steps
+  → /dashboard → see welcome state
+  → recommendation card loads
+  → quick log buttons work
+
+Flow 2 — Log symptoms (flare):
+  → /symptoms/log
+  → set pain = 8, flare = severe
+  → save → escalation banner appears
+  → dashboard shows flare banner
+  → recommendation shows flare_only mode
+    with gentle meals
+
+Flow 3 — Log symptoms (normal):
+  → /symptoms/log
+  → set pain = 2, flare = none
+  → save → normal mode
+  → recommendation shows balanced meals
+
+Flow 4 — Log a meal:
+  → /meals/log
+  → search "salmon"
+  → set portion 150g
+  → log it
+  → nutrition summary updates on dashboard
+
+Flow 5 — Custom meal:
+  → /meals/custom
+  → add chicken 150g + spinach 80g
+  → see live nutrient calculation
+  → search "dragonfruit" → not found
+  → add to review list
+  → save meal → log immediately
+
+Flow 6 — Profile:
+  → /profile
+  → update preferences
+  → add medication
+  → change password
+
+Fix any issues found during manual testing.
+
+Print: ✓ TASK 15 COMPLETE
+
+───────────────────────────────────────────────────────────
+TASK 16 — WRITE WEEK 7 SUMMARY
+───────────────────────────────────────────────────────────
+
+Write week7_summary.md covering:
+
+1. Migration 0007
+   - admin role column added
+
+2. React setup
+   - packages installed
+   - folder structure confirmed
+   - API client + auth context working
+
+3. Screens built
+   - list all pages built
+   - any screens skipped or simplified
+
+4. Components built
+   - list reusable components
+
+5. Auth flow verified
+   - token refresh on mount working
+   - 401 retry working
+   - logout working
+
+6. Manual test results
+   - all 6 flows passed or issues found
+
+7. Known limitations
+   - anything deferred to Week 8
+
+8. Open questions for Week 8
+   - which analytics charts to add?
+   - any UX issues found in manual testing?
+
+9. What Week 8 needs
+   - confirmed screen structure
+   - confirmed API hooks working
+   - confirmed chart library working
+
+═══════════════════════════════════════════════════════════
+EXECUTION RULES
+═══════════════════════════════════════════════════════════
+
+STYLING RULES:
+- Tailwind CSS only — no inline styles
+- Mobile-first breakpoints:
+  default → mobile
+  sm: → tablet
+  md: → desktop
+- Minimum tap target: 44px height always
+- Body text minimum: 16px (text-base)
+- Headings: font-semibold not font-bold
+- Colours:
+  Primary teal: bg-teal-600 text-teal-600
+  Light teal: bg-teal-50
+  Escalation: bg-orange-50 text-orange-800
+  Error: text-red-600
+  Success: text-green-600
+  Background: bg-gray-50
+  Cards: bg-white
+  Muted text: text-gray-500
+
+ACCESSIBILITY RULES:
+- All inputs have labels
+- All buttons have descriptive text
+- No colour-only information
+  (always pair colour with text/icon)
+- Focus rings visible on all interactive
+  elements (focus:ring-2 focus:ring-teal-500)
+
+API RULES:
+- All API calls go through src/api/client.js
+- Never call fetch() directly
+- Always handle loading and error states
+- Never show blank white screen
+  always show skeleton or message
+
+AUTH RULES:
+- NEVER use localStorage
+- NEVER use sessionStorage
+- access_token in AuthContext state only
+- withCredentials: true on all requests
+  (sends httpOnly cookie automatically)
+
+MEDICAL RULES:
+- EscalationBanner never blocks interaction
+- Always show disclaimer on medication screen
+- Never claim app cures or treats RA
+- Recommendation explanation shown as-is
+  from API (already hedged correctly)
+
+DO NOT CHANGE:
+- Any backend Python files
+- Any database migrations
+- docs/api_contract.md
+
+GENERAL:
+- Complete every task fully before moving
+- Write and save all files to disk
+- No placeholder components — all must
+  connect to real API
+- At end of each task: ✓ TASK [N] COMPLETE
+- When all done print:
+  ✓ WEEK 7 COMPLETE — frontend built,
+  all screens connected to API,
+  manual flows verified,
+  Week 8 analytics ready to begin
+
+Begin now with Task 1.

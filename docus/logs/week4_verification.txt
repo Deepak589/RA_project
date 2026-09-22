@@ -1,0 +1,81 @@
+Week 4 Verification
+
+Query 1 - food catalog final state
+category  | cooking_state | count | quality_flag     
+----------+---------------+-------+------------------
+fish      | raw           | 2     | usda_verified    
+fish      | cooked        | 3     | usda_verified    
+fish      | ready_to_eat  | 5     | usda_verified    
+fruit     | raw           | 5     | usda_verified    
+grain     | raw           | 5     | usda_verified    
+legume    | cooked        | 2     | usda_verified    
+legume    | raw           | 3     | manually_verified
+legume    | ready_to_eat  | 3     | usda_verified    
+legume    | raw           | 2     | usda_verified    
+nut_seed  | raw           | 1     | usda_verified    
+oil       | ready_to_eat  | 2     | manually_verified
+oil       | ready_to_eat  | 1     | usda_verified    
+other     | ready_to_eat  | 1     | usda_verified    
+other     | raw           | 1     | usda_verified    
+protein   | ready_to_eat  | 5     | usda_verified    
+protein   | raw           | 2     | usda_verified    
+protein   | cooked        | 1     | usda_verified    
+spice     | ready_to_eat  | 2     | usda_verified    
+vegetable | raw           | 7     | usda_verified    
+
+Query 2 - no calories = 0 remaining
+(0 rows)
+
+Query 3 - meal library summary
+meal_type | count | avg_score | veg_count | flare_count
+----------+-------+-----------+-----------+------------
+breakfast | 20    | 5.5       | 20        | 0          
+dinner    | 25    | 6.8       | 7         | 13         
+flare_day | 15    | 5.9       | 15        | 15         
+lunch     | 25    | 6.5       | 13        | 7          
+snack     | 15    | 5.6       | 15        | 0          
+
+Query 4 - top 10 scoring meals
+name                                              | meal_type | anti_inflammatory_score | is_flare_friendly | is_vegetarian
+--------------------------------------------------+-----------+-------------------------+-------------------+--------------
+Salmon and lentil dinner                          | dinner    | 7.6                     | True              | False        
+Salmon and lentil bowl                            | lunch     | 7.6                     | True              | False        
+Grilled mackerel with roasted broccoli and quinoa | dinner    | 7.4                     | True              | False        
+Lentil and kidney bean stew                       | lunch     | 7.3                     | True              | True         
+Bean and lentil stew                              | dinner    | 7.3                     | True              | True         
+Grilled salmon with quinoa                        | lunch     | 7.3                     | True              | False        
+Grilled trout with quinoa and spinach             | dinner    | 7.3                     | True              | False        
+Herring and quinoa bowl                           | dinner    | 7.3                     | True              | False        
+Bean and vegetable stew                           | lunch     | 7.2                     | True              | True         
+Grilled salmon with roasted vegetables            | dinner    | 7.2                     | True              | False        
+
+Query 5 - ingredient coverage
+foods_used | total_ingredient_rows
+-----------+----------------------
+26         | 369                  
+
+Query 6 - tag distribution
+tag               | meal_count
+------------------+-----------
+vegetarian        | 70        
+high_protein      | 41        
+high_fiber        | 29        
+lunch             | 25        
+dinner            | 25        
+anti_inflammatory | 22        
+fish              | 20        
+breakfast         | 20        
+high_omega3       | 16        
+snack             | 15        
+flare_friendly    | 15        
+flare_day         | 15        
+
+Query 7a - custom meals empty
+custom_meals_count
+------------------
+0                 
+
+Query 7b - custom meal ingredients empty
+custom_meal_ingredients_count
+-----------------------------
+0                            

@@ -1,0 +1,100 @@
+Week 5 Verification
+Generated: 2026-04-22
+
+Query 1 - food_logs columns exist:
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'tracking'
+AND table_name = 'food_logs'
+ORDER BY ordinal_position;
+
+       column_name
+--------------------------
+ id
+ user_id
+ food_id
+ meal_id
+ custom_food_name
+ meal_type
+ portion_g
+ portion_label
+ notes
+ logged_at
+ created_at
+ updated_at
+ log_source
+ raw_portion_g
+ cooking_state_at_log
+ conversion_factor_at_log
+ display_calories
+ display_protein_g
+ recommendation_meal_id
+ custom_meal_id
+(20 rows)
+
+Query 2 - recommendation_logs columns exist:
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'intelligence'
+AND table_name = 'recommendation_logs'
+ORDER BY ordinal_position;
+
+         column_name
+------------------------------
+ id
+ user_id
+ meal_id
+ recommended_for_meal_type
+ recommendation_context_jsonb
+ explanation_text
+ alternatives_jsonb
+ rules_applied_jsonb
+ shown_at
+ feedback_status
+ feedback_reason
+ replacement_food_id
+ replacement_meal_id
+ created_at
+ updated_at
+ rule_priority_applied
+ flare_mode_active
+ daily_nutrition_context_json
+(18 rows)
+
+Query 3 - food log source counts:
+SELECT log_source, COUNT(*),
+       AVG(display_calories) as avg_display_cal
+FROM tracking.food_logs
+GROUP BY log_source;
+
+ log_source | count |   avg_display_cal
+------------+-------+---------------------
+ manual_log |     3 | 38.6400000000000000
+(1 row)
+
+Query 4 - recommendation saved correctly:
+SELECT rule_priority_applied,
+       flare_mode_active,
+       feedback_status,
+       shown_at
+FROM intelligence.recommendation_logs
+ORDER BY shown_at DESC
+LIMIT 5;
+
+ rule_priority_applied | flare_mode_active | feedback_status |           shown_at
+-----------------------+-------------------+-----------------+-------------------------------
+ flare                 | t                 | pending         | 2026-04-22 10:45:33.297151+00
+ medication            | f                 | pending         | 2026-04-22 10:45:33.243953+00
+ medication            | f                 | accepted        | 2026-04-22 10:45:33.102041+00
+ medication            | f                 | accepted        | 2026-04-22 10:45:04.318131+00
+(4 rows)
+
+Query 5 - escalation not triggered for low pain:
+SELECT pain_score, escalation_triggered
+FROM tracking.symptom_logs
+ORDER BY created_at DESC
+LIMIT 5;
+
+ pain_score | escalation_triggered
+------------+----------------------
+          3 | f
+          3 | f
+(2 rows)

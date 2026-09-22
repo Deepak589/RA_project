@@ -1,0 +1,73 @@
+{
+  "mode": "full-run",
+  "started_at": "2026-04-20T09:20:20.995348+00:00",
+  "terms": [
+    {
+      "term": "lentils",
+      "data_type": "SR Legacy",
+      "result_count": 3
+    },
+    {
+      "term": "lentils cooked",
+      "data_type": "SR Legacy",
+      "result_count": 3
+    }
+  ],
+  "foods": [
+    {
+      "term": "lentils",
+      "data_type": "SR Legacy",
+      "external_id": "172420",
+      "name": "Lentils, raw",
+      "category": "legume",
+      "anti_inflammatory_score": 8.0,
+      "status": "inserted"
+    },
+    {
+      "term": "lentils",
+      "data_type": "SR Legacy",
+      "external_id": "168427",
+      "name": "Lentils, sprouted, raw",
+      "category": "vegetable",
+      "anti_inflammatory_score": 6.0,
+      "status": "inserted"
+    },
+    {
+      "term": "lentils",
+      "data_type": "SR Legacy",
+      "external_id": "174284",
+      "name": "Lentils, pink or red, raw",
+      "category": "legume",
+      "anti_inflammatory_score": 8.0,
+      "status": "inserted"
+    },
+    {
+      "term": "lentils cooked",
+      "data_type": "SR Legacy",
+      "external_id": "175254",
+      "name": "Lentils, mature seeds, cooked, boiled, with salt",
+      "category": "legume",
+      "anti_inflammatory_score": 7.5,
+      "status": "inserted"
+    },
+    {
+      "term": "lentils cooked",
+      "data_type": "SR Legacy",
+      "external_id": "168551",
+      "name": "Lentils, sprouted, cooked, stir-fried, with salt",
+      "category": "vegetable",
+      "anti_inflammatory_score": 6.0,
+      "status": "inserted"
+    },
+    {
+      "term": "lentils cooked",
+      "data_type": "SR Legacy",
+      "external_id": "172421",
+      "name": "Lentils, mature seeds, cooked, boiled, without salt",
+      "category": "legume",
+      "anti_inflammatory_score": 7.5,
+      "status": "inserted"
+    }
+  ],
+  "finished_at": "2026-04-20T09:20:23.080064+00:00"
+}

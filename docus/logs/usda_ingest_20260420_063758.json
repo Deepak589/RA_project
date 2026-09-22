@@ -1,0 +1,379 @@
+{
+  "mode": "full-run",
+  "started_at": "2026-04-20T06:37:46.377642+00:00",
+  "terms": [
+    {
+      "term": "chicken",
+      "result_count": 3
+    },
+    {
+      "term": "salmon",
+      "result_count": 3
+    },
+    {
+      "term": "spinach",
+      "result_count": 3
+    },
+    {
+      "term": "lentils",
+      "result_count": 3
+    },
+    {
+      "term": "brown rice",
+      "result_count": 3
+    },
+    {
+      "term": "oats",
+      "result_count": 3
+    },
+    {
+      "term": "walnuts",
+      "result_count": 3
+    },
+    {
+      "term": "olive oil",
+      "result_count": 3
+    },
+    {
+      "term": "sweet potato",
+      "result_count": 3
+    },
+    {
+      "term": "blueberries",
+      "result_count": 3
+    },
+    {
+      "term": "kidney beans",
+      "result_count": 3
+    },
+    {
+      "term": "tofu",
+      "result_count": 3
+    },
+    {
+      "term": "Greek yogurt",
+      "result_count": 3
+    },
+    {
+      "term": "eggs",
+      "result_count": 3
+    },
+    {
+      "term": "broccoli",
+      "result_count": 3
+    },
+    {
+      "term": "quinoa",
+      "result_count": 3
+    },
+    {
+      "term": "avocado",
+      "result_count": 3
+    },
+    {
+      "term": "garlic",
+      "result_count": 3
+    },
+    {
+      "term": "turmeric",
+      "result_count": 1
+    },
+    {
+      "term": "ginger",
+      "result_count": 3
+    }
+  ],
+  "foods": [
+    {
+      "term": "chicken",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest chicken] When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "chicken",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest chicken] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "chicken",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest chicken] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "salmon",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest salmon] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "salmon",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest salmon] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "salmon",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest salmon] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "spinach",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest spinach] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "spinach",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest spinach] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "spinach",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest spinach] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "lentils",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest lentils] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "lentils",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest lentils] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "lentils",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest lentils] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "brown rice",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest brown rice] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "brown rice",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest brown rice] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "brown rice",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest brown rice] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "oats",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest oats] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "oats",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest oats] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "oats",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest oats] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "walnuts",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest walnuts] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "walnuts",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest walnuts] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "walnuts",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest walnuts] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "olive oil",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest olive oil] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "olive oil",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest olive oil] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "olive oil",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest olive oil] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "sweet potato",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest sweet potato] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "sweet potato",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest sweet potato] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "sweet potato",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest sweet potato] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "blueberries",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest blueberries] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "blueberries",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest blueberries] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "blueberries",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest blueberries] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "kidney beans",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest kidney beans] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "kidney beans",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest kidney beans] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "kidney beans",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest kidney beans] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "tofu",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest tofu] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "tofu",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest tofu] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "tofu",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest tofu] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "Greek yogurt",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest Greek yogurt] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "Greek yogurt",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest Greek yogurt] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "Greek yogurt",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest Greek yogurt] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "eggs",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest eggs] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "eggs",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest eggs] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "eggs",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest eggs] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "broccoli",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest broccoli] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "broccoli",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest broccoli] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "broccoli",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest broccoli] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "quinoa",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest quinoa] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "quinoa",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest quinoa] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "quinoa",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest quinoa] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "avocado",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest avocado] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "avocado",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest avocado] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "avocado",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest avocado] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "garlic",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest garlic] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "garlic",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest garlic] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "garlic",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest garlic] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "turmeric",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest turmeric] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "ginger",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest ginger] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "ginger",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest ginger] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    },
+    {
+      "term": "ginger",
+      "status": "error",
+      "error": "[DATA ISSUE: failed to ingest ginger] One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Food(foods)]'. Original exception was: When initializing mapper Mapper[Food(foods)], expression 'FoodLog' failed to locate a name ('FoodLog'). If this is a class name, consider adding this relationship() to the <class 'app.models.food.Food'> class after both dependent classes have been defined."
+    }
+  ],
+  "finished_at": "2026-04-20T06:37:58.253447+00:00"
+}

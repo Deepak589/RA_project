@@ -1,0 +1,400 @@
+{
+  "started_at": "2026-04-21T10:02:41.574580+00:00",
+  "terms": [
+    {
+      "term": "tuna cooked",
+      "data_type": "Foundation",
+      "result_count": 10
+    },
+    {
+      "term": "tuna canned in water",
+      "data_type": "Foundation",
+      "result_count": 10
+    },
+    {
+      "term": "sardines canned in oil",
+      "data_type": "Foundation",
+      "result_count": 10
+    },
+    {
+      "term": "mackerel cooked",
+      "data_type": "Foundation",
+      "result_count": 9
+    },
+    {
+      "term": "cod cooked",
+      "data_type": "Foundation",
+      "result_count": 10
+    },
+    {
+      "term": "trout cooked",
+      "data_type": "Foundation",
+      "result_count": 9
+    },
+    {
+      "term": "herring cooked",
+      "data_type": "Foundation",
+      "result_count": 9
+    }
+  ],
+  "foods": [
+    {
+      "term": "tuna cooked",
+      "external_id": "2747673",
+      "name": "Tuna, ahi or yellowfin, frozen, wild caught",
+      "status": "skipped_duplicate"
+    },
+    {
+      "term": "tuna cooked",
+      "external_id": "334194",
+      "name": "Fish, tuna, light, canned in water, drained solids",
+      "status": "skipped_duplicate"
+    },
+    {
+      "term": "tuna cooked",
+      "external_id": "749420",
+      "name": "Pork, cured, bacon, cooked, restaurant",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna cooked",
+      "external_id": "326196",
+      "name": "Kale, frozen, cooked, boiled, drained, without salt",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna cooked",
+      "external_id": "746779",
+      "name": "Sausage, breakfast sausage, beef, pre-cooked, unprepared",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna cooked",
+      "external_id": "746780",
+      "name": "Sausage, Italian, pork, mild, cooked, pan-fried",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna cooked",
+      "external_id": "331897",
+      "name": "Chicken, broilers or fryers, drumstick, meat only, cooked, braised",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna cooked",
+      "external_id": "746781",
+      "name": "Sausage, pork, chorizo, link or ground, cooked, pan-fried",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna cooked",
+      "external_id": "331960",
+      "name": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, braised",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna cooked",
+      "external_id": "746758",
+      "name": "Beef, loin, tenderloin roast, separable lean only, boneless, trimmed to 0\" fat, select, cooked, roasted",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna canned in water",
+      "external_id": "334194",
+      "name": "Fish, tuna, light, canned in water, drained solids",
+      "status": "skipped_duplicate"
+    },
+    {
+      "term": "tuna canned in water",
+      "external_id": "2685582",
+      "name": "Tomato, puree, canned",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna canned in water",
+      "external_id": "2685581",
+      "name": "Tomatoes, crushed, canned",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna canned in water",
+      "external_id": "2685579",
+      "name": "Tomato, sauce, canned, with salt added",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna canned in water",
+      "external_id": "333281",
+      "name": "Tomatoes, canned, red, ripe, diced",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna canned in water",
+      "external_id": "2747673",
+      "name": "Tuna, ahi or yellowfin, frozen, wild caught",
+      "status": "skipped_duplicate"
+    },
+    {
+      "term": "tuna canned in water",
+      "external_id": "2747652",
+      "name": "Anchovies, canned in olive oil, with salt, drained",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna canned in water",
+      "external_id": "325287",
+      "name": "Grapefruit juice, white, canned or bottled, unsweetened",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna canned in water",
+      "external_id": "2685580",
+      "name": "Tomato, paste, canned, without salt added",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "tuna canned in water",
+      "external_id": "2644285",
+      "name": "Beans, black, canned, sodium added, drained and rinsed",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "sardines canned in oil",
+      "external_id": "2747652",
+      "name": "Anchovies, canned in olive oil, with salt, drained",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "sardines canned in oil",
+      "external_id": "2685582",
+      "name": "Tomato, puree, canned",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "sardines canned in oil",
+      "external_id": "2685581",
+      "name": "Tomatoes, crushed, canned",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "sardines canned in oil",
+      "external_id": "748278",
+      "name": "Oil, canola",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "sardines canned in oil",
+      "external_id": "330458",
+      "name": "Oil, coconut",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "sardines canned in oil",
+      "external_id": "748323",
+      "name": "Oil, corn",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "sardines canned in oil",
+      "external_id": "1750348",
+      "name": "Oil, peanut",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "sardines canned in oil",
+      "external_id": "1750350",
+      "name": "Oil, safflower",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "sardines canned in oil",
+      "external_id": "748366",
+      "name": "Oil, soybean",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "sardines canned in oil",
+      "external_id": "1750349",
+      "name": "Oil, sunflower",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "mackerel cooked",
+      "external_id": "749420",
+      "name": "Pork, cured, bacon, cooked, restaurant",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "mackerel cooked",
+      "external_id": "326196",
+      "name": "Kale, frozen, cooked, boiled, drained, without salt",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "mackerel cooked",
+      "external_id": "746779",
+      "name": "Sausage, breakfast sausage, beef, pre-cooked, unprepared",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "mackerel cooked",
+      "external_id": "746780",
+      "name": "Sausage, Italian, pork, mild, cooked, pan-fried",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "mackerel cooked",
+      "external_id": "331897",
+      "name": "Chicken, broilers or fryers, drumstick, meat only, cooked, braised",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "mackerel cooked",
+      "external_id": "746781",
+      "name": "Sausage, pork, chorizo, link or ground, cooked, pan-fried",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "mackerel cooked",
+      "external_id": "331960",
+      "name": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, braised",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "mackerel cooked",
+      "external_id": "746758",
+      "name": "Beef, loin, tenderloin roast, separable lean only, boneless, trimmed to 0\" fat, select, cooked, roasted",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "mackerel cooked",
+      "external_id": "746763",
+      "name": "Beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "cod cooked",
+      "external_id": "2747654",
+      "name": "Cod, Pacific or Alaskan, frozen, wild caught",
+      "status": "skipped_duplicate"
+    },
+    {
+      "term": "cod cooked",
+      "data_type": "Foundation",
+      "external_id": "2684444",
+      "name": "Fish, cod, Atlantic, wild caught, raw",
+      "omega3_g": 0.075,
+      "anti_inflammatory_score": 6.0,
+      "status": "inserted"
+    },
+    {
+      "term": "trout cooked",
+      "external_id": "749420",
+      "name": "Pork, cured, bacon, cooked, restaurant",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "trout cooked",
+      "external_id": "326196",
+      "name": "Kale, frozen, cooked, boiled, drained, without salt",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "trout cooked",
+      "external_id": "746779",
+      "name": "Sausage, breakfast sausage, beef, pre-cooked, unprepared",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "trout cooked",
+      "external_id": "746780",
+      "name": "Sausage, Italian, pork, mild, cooked, pan-fried",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "trout cooked",
+      "external_id": "331897",
+      "name": "Chicken, broilers or fryers, drumstick, meat only, cooked, braised",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "trout cooked",
+      "external_id": "746781",
+      "name": "Sausage, pork, chorizo, link or ground, cooked, pan-fried",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "trout cooked",
+      "external_id": "331960",
+      "name": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, braised",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "trout cooked",
+      "external_id": "746758",
+      "name": "Beef, loin, tenderloin roast, separable lean only, boneless, trimmed to 0\" fat, select, cooked, roasted",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "trout cooked",
+      "external_id": "746763",
+      "name": "Beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "herring cooked",
+      "external_id": "749420",
+      "name": "Pork, cured, bacon, cooked, restaurant",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "herring cooked",
+      "external_id": "326196",
+      "name": "Kale, frozen, cooked, boiled, drained, without salt",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "herring cooked",
+      "external_id": "746779",
+      "name": "Sausage, breakfast sausage, beef, pre-cooked, unprepared",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "herring cooked",
+      "external_id": "746780",
+      "name": "Sausage, Italian, pork, mild, cooked, pan-fried",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "herring cooked",
+      "external_id": "331897",
+      "name": "Chicken, broilers or fryers, drumstick, meat only, cooked, braised",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "herring cooked",
+      "external_id": "746781",
+      "name": "Sausage, pork, chorizo, link or ground, cooked, pan-fried",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "herring cooked",
+      "external_id": "331960",
+      "name": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, braised",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "herring cooked",
+      "external_id": "746758",
+      "name": "Beef, loin, tenderloin roast, separable lean only, boneless, trimmed to 0\" fat, select, cooked, roasted",
+      "status": "skipped_non_fish_match"
+    },
+    {
+      "term": "herring cooked",
+      "external_id": "746763",
+      "name": "Beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled",
+      "status": "skipped_non_fish_match"
+    }
+  ],
+  "finished_at": "2026-04-21T10:02:49.019907+00:00"
+}
